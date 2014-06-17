@@ -8,7 +8,7 @@
   <packaging>jar</packaging>
 
   <name>pusher-rest-java</name>
-  <url>http://maven.apache.org</url>
+  <url>http://github.com/pusher/pusher-rest-java</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
