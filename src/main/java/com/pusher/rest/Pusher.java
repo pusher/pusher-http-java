@@ -141,7 +141,7 @@ public class Pusher {
         final String path = "/apps/" + appId + "/events";
         final String body = BODY_SERIALISER.toJson(triggerData);
 
-        final URI uri = PusherRequest.uri("POST", scheme, host, path, body, key, secret, Collections.<String, String>emptyMap());
+        final URI uri = SignedRequest.uri("POST", scheme, host, path, body, key, secret, Collections.<String, String>emptyMap());
 
         final StringEntity bodyEntity = new StringEntity(body, "UTF-8");
         bodyEntity.setContentType("application/json");

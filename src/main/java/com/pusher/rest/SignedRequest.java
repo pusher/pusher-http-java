@@ -17,7 +17,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.client.utils.URIBuilder;
 
-public class PusherRequest {
+public class SignedRequest {
 
     public static URI uri(final String method,
                           final String scheme,
