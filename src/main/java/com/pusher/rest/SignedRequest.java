@@ -79,7 +79,8 @@ public class SignedRequest {
         return Hex.encodeHexString(digest);
     }
 
-    private static String buildSignatureString(final String method, final String path, final Map<String, String> queryParams) {
+    // Visible for testing
+    static String buildSignatureString(final String method, final String path, final Map<String, String> queryParams) {
         final StringBuilder sb = new StringBuilder();
         sb.append(method)
             .append('\n')
