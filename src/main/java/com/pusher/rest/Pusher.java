@@ -8,8 +8,11 @@ import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.DefaultConnectionReuseStrategy;
+import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
@@ -29,6 +32,7 @@ public class Pusher {
 
     private String host = "api.pusherapp.com";
     private String scheme = "http";
+    private int requestTimeout = 4000; // milliseconds
 
     private HttpClient client;
     private Gson dataMarshaller;
@@ -54,6 +58,8 @@ public class Pusher {
 
         this.client = HttpClientBuilder.create()
                 .setConnectionManager(new PoolingHttpClientConnectionManager())
+                .setConnectionReuseStrategy(new DefaultConnectionReuseStrategy())
+                .setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
                 .build();
 
         this.dataMarshaller = new Gson();
@@ -83,6 +89,15 @@ public class Pusher {
      */
     public void setSecure(final boolean secure) {
         this.scheme = secure ? "https" : "http";
+    }
+
+    /**
+     * Set the request timeout in milliseconds
+     *
+     * Default 4000
+     */
+    public void setRequestTimeout(final int requestTimeout) {
+        this.requestTimeout = requestTimeout;
     }
 
     /**
@@ -149,6 +164,13 @@ public class Pusher {
 
         final HttpPost request = new HttpPost(uri);
         request.setEntity(bodyEntity);
+
+        final RequestConfig config = RequestConfig.custom()
+                .setSocketTimeout(requestTimeout)
+                .setConnectionRequestTimeout(requestTimeout)
+                .setConnectTimeout(requestTimeout)
+                .build();
+        request.setConfig(config);
 
         try {
             final HttpResponse response = client.execute(request);
