@@ -1,11 +1,12 @@
 package com.pusher.rest;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.http.client.ClientProtocolException;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -134,32 +135,33 @@ public class Pusher {
         Prerequisites.maxLength("channels", 10, channels);
         Prerequisites.noNullMembers("channels", channels);
 
-        return trigger(new TriggerData(channels, eventName, serialise(data), socketId));
+        final String path = "/apps/" + appId + "/events";
+        final String body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
+
+        return httpCall(path, body);
     }
 
-    private Result trigger(final TriggerData triggerData) {
-        final String path = "/apps/" + appId + "/events";
-        final String body = BODY_SERIALISER.toJson(triggerData);
-
+    Result httpCall(final String path, final String body) {
         final URI uri = SignedRequest.uri("POST", scheme, host, path, body, key, secret, Collections.<String, String>emptyMap());
 
         final StringEntity bodyEntity = new StringEntity(body, "UTF-8");
         bodyEntity.setContentType("application/json");
 
-        final HttpPost httpRequest = new HttpPost(uri);
-        httpRequest.setEntity(bodyEntity);
+        final HttpPost request = new HttpPost(uri);
+        request.setEntity(bodyEntity);
 
         try {
-            client.execute(httpRequest);
-        }
-        catch (final ClientProtocolException e) {
-            System.out.println(e.getMessage());
+            final HttpResponse response = client.execute(request);
+
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            response.getEntity().writeTo(baos);
+            final String responseBody = new String(baos.toByteArray(), "UTF-8");
+
+            return Result.fromHttpCode(response.getStatusLine().getStatusCode(), responseBody);
         }
         catch (final IOException e) {
-            System.out.println(e);
+            return Result.fromException(e);
         }
-
-        return Result.OK;
     }
 
     /**

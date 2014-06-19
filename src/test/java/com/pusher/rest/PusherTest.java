@@ -19,11 +19,14 @@ import org.junit.Test;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.GsonBuilder;
 
+/**
+ * Tests which mock the HttpClient to check outgoing requests
+ */
 public class PusherTest {
 
-    private static final String APP_ID = "00001";
-    private static final String KEY    = "157a2f3df564323a4a73";
-    private static final String SECRET = "3457a88be87f890dcd98";
+    static final String APP_ID = "00001";
+    static final String KEY    = "157a2f3df564323a4a73";
+    static final String SECRET = "3457a88be87f890dcd98";
 
     private final Mockery context = new JUnit4Mockery();
 
