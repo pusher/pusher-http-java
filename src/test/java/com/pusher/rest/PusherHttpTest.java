@@ -9,6 +9,7 @@ import java.io.IOException;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.localserver.LocalTestServer;
 import org.apache.http.protocol.HttpContext;
@@ -25,7 +26,7 @@ import com.pusher.rest.Result.Status;
 public class PusherHttpTest {
 
     private LocalTestServer server;
-    private String host;
+    private HttpGet request;
 
     private int responseStatus = 200;
     private String responseBody;
@@ -46,10 +47,9 @@ public class PusherHttpTest {
         });
 
         server.start();
-        host = server.getServiceAddress().getHostName() + ":" + server.getServiceAddress().getPort();
+        request = new HttpGet("http://" + server.getServiceAddress().getHostName() + ":" + server.getServiceAddress().getPort() + "/test");
 
         p = new Pusher(PusherTest.APP_ID, PusherTest.KEY, PusherTest.SECRET);
-        p.setHost(host);
     }
 
     @After
@@ -62,7 +62,7 @@ public class PusherHttpTest {
         responseStatus = 200;
         responseBody = "{}";
 
-        Result result = p.httpCall("/", "test");
+        Result result = p.httpCall(request);
         assertThat(result.getStatus(), is(Status.OK));
         assertThat(result.getMessage(), is(responseBody));
     }
@@ -72,7 +72,7 @@ public class PusherHttpTest {
         responseStatus = 400;
         responseBody = "A lolcat got all up in ur request";
 
-        Result result = p.httpCall("/", "test");
+        Result result = p.httpCall(request);
         assertThat(result.getStatus(), is(Status.CLIENT_ERROR));
         assertThat(result.getMessage(), is(responseBody));
     }
@@ -82,7 +82,7 @@ public class PusherHttpTest {
         responseStatus = 401;
         responseBody = "Sorry, not in those shoes";
 
-        Result result = p.httpCall("/", "test");
+        Result result = p.httpCall(request);
         assertThat(result.getStatus(), is(Status.AUTHENTICATION_ERROR));
         assertThat(result.getMessage(), is(responseBody));
     }
@@ -92,8 +92,18 @@ public class PusherHttpTest {
         responseStatus = 403;
         responseBody = "Sorry, not with all those friends";
 
-        Result result = p.httpCall("/", "test");
+        Result result = p.httpCall(request);
         assertThat(result.getStatus(), is(Status.MESSAGE_QUOTA_EXCEEDED));
+        assertThat(result.getMessage(), is(responseBody));
+    }
+
+    @Test
+    public void status404ReturnsNotFoundErrorAndMessage() throws Exception {
+        responseStatus = 404;
+        responseBody = "This is not the endpoint you are looking for";
+
+        Result result = p.httpCall(request);
+        assertThat(result.getStatus(), is(Status.NOT_FOUND));
         assertThat(result.getMessage(), is(responseBody));
     }
 
@@ -102,7 +112,7 @@ public class PusherHttpTest {
         responseStatus = 500;
         responseBody = "Gary? Gary! It's on fire!!";
 
-        Result result = p.httpCall("/", "test");
+        Result result = p.httpCall(request);
         assertThat(result.getStatus(), is(Status.SERVER_ERROR));
         assertThat(result.getMessage(), is(responseBody));
     }
@@ -112,7 +122,7 @@ public class PusherHttpTest {
         responseStatus = 503;
         responseBody = "Gary, did you restart all the back-ends at once?!";
 
-        Result result = p.httpCall("/", "test");
+        Result result = p.httpCall(request);
         assertThat(result.getStatus(), is(Status.SERVER_ERROR));
         assertThat(result.getMessage(), is(responseBody));
     }
@@ -121,7 +131,7 @@ public class PusherHttpTest {
     public void connectionRefusedReturnsNetworkError() throws Exception {
         server.stop(); // don't listen for this test
 
-        Result result = p.httpCall("/", "test");
+        Result result = p.httpCall(request);
         assertThat(result.getStatus(), is(Status.NETWORK_ERROR));
         assertThat(result.getMessage(), containsString("Connection refused"));
     }

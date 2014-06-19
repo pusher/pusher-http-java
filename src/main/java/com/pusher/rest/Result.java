@@ -3,6 +3,7 @@ package com.pusher.rest;
 import static com.pusher.rest.Result.Status.AUTHENTICATION_ERROR;
 import static com.pusher.rest.Result.Status.CLIENT_ERROR;
 import static com.pusher.rest.Result.Status.MESSAGE_QUOTA_EXCEEDED;
+import static com.pusher.rest.Result.Status.NOT_FOUND;
 import static com.pusher.rest.Result.Status.OK;
 import static com.pusher.rest.Result.Status.SERVER_ERROR;
 import static com.pusher.rest.Result.Status.UNKNOWN_ERROR;
@@ -17,6 +18,7 @@ public class Result {
         CLIENT_ERROR(false),
         AUTHENTICATION_ERROR(false),
         MESSAGE_QUOTA_EXCEEDED(false),
+        NOT_FOUND(false),
         SERVER_ERROR(true),
         NETWORK_ERROR(true),
         UNKNOWN_ERROR(true),
@@ -60,6 +62,9 @@ public class Result {
             break;
         case 403:
             status = MESSAGE_QUOTA_EXCEEDED;
+            break;
+        case 404:
+            status = NOT_FOUND;
             break;
         default:
             status = statusCode >= 500 && statusCode < 600 ? SERVER_ERROR : UNKNOWN_ERROR;

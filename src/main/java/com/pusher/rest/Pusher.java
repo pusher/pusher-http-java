@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -193,14 +196,44 @@ public class Pusher {
         Prerequisites.maxLength("channels", 10, channels);
         Prerequisites.noNullMembers("channels", channels);
 
-        final String path = "/apps/" + appId + "/events";
         final String body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
 
-        return httpCall(path, body);
+        return post("/events", body);
     }
 
-    Result httpCall(final String path, final String body) {
-        final URI uri = SignedRequest.uri("POST", scheme, host, path, body, key, secret, Collections.<String, String>emptyMap());
+    /**
+     * Make a generic REST call to the Pusher API.
+     *
+     * See: http://pusher.com/docs/rest_api
+     *
+     * Parameters should be a map of query parameters for the REST call, and may be null
+     * if none are required.
+     *
+     * NOTE: the path specified here is relative to that of your app. For example, to access
+     * the channel list for your app, simply pass "/channels". Do not include the "/apps/[appId]"
+     * at the beginning of the path.
+     */
+    public Result get(final String path, final Map<String, String> parameters) {
+        final String fullPath = "/apps/" + appId + path;
+        final URI uri = SignedRequest.uri("GET", scheme, host, fullPath, null, key, secret, parameters);
+
+        return httpCall(new HttpGet(uri));
+    }
+
+    /**
+     * Make a generic REST call to the Pusher API.
+     *
+     * The body should be a UTF-8 encoded String
+     *
+     * See: http://pusher.com/docs/rest_api
+     *
+     * NOTE: the path specified here is relative to that of your app. For example, to access
+     * the channel list for your app, simply pass "/channels". Do not include the "/apps/[appId]"
+     * at the beginning of the path.
+     */
+    public Result post(final String path, final String body) {
+        final String fullPath = "/apps/" + appId + path;
+        final URI uri = SignedRequest.uri("POST", scheme, host, fullPath, body, key, secret, Collections.<String, String>emptyMap());
 
         final StringEntity bodyEntity = new StringEntity(body, "UTF-8");
         bodyEntity.setContentType("application/json");
@@ -208,6 +241,10 @@ public class Pusher {
         final HttpPost request = new HttpPost(uri);
         request.setEntity(bodyEntity);
 
+        return httpCall(request);
+    }
+
+    Result httpCall(final HttpRequestBase request) {
         final RequestConfig config = RequestConfig.custom()
                 .setSocketTimeout(requestTimeout)
                 .setConnectionRequestTimeout(requestTimeout)
