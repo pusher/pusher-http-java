@@ -83,8 +83,8 @@ public class Pusher {
      *
      * Default: false
      */
-    public void setSecure(final boolean secure) {
-        this.scheme = secure ? "https" : "http";
+    public void setEncrypted(final boolean encrypted) {
+        this.scheme = encrypted ? "https" : "http";
     }
 
     /**
