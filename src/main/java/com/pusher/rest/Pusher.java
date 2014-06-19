@@ -236,9 +236,4 @@ public class Pusher {
     protected String serialise(final Object data) {
         return dataMarshaller.toJson(data);
     }
-
-    // Inject mock for testing
-    void setHttpClient(final CloseableHttpClient client) {
-        this.client = client;
-    }
 }

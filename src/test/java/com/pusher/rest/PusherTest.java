@@ -9,10 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,15 +30,22 @@ public class PusherTest {
     static final String KEY    = "157a2f3df564323a4a73";
     static final String SECRET = "3457a88be87f890dcd98";
 
-    private final Mockery context = new JUnit4Mockery();
+    private final Mockery context = new JUnit4Mockery() {{
+        setImposteriser(ClassImposteriser.INSTANCE);
+    }};
 
-    private HttpClient httpClient = context.mock(HttpClient.class);
+    private CloseableHttpClient httpClient = context.mock(CloseableHttpClient.class);
 
     private final Pusher p = new Pusher(APP_ID, KEY, SECRET);
 
     @Before
     public void setup() {
-        p.setHttpClient(httpClient);
+        p.configureHttpClient(new HttpClientBuilder() {
+            @Override
+            public CloseableHttpClient build() {
+                return httpClient;
+            }
+        });
     }
 
     /*
