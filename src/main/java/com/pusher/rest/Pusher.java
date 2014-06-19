@@ -7,11 +7,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -34,7 +34,7 @@ public class Pusher {
     private String scheme = "http";
     private int requestTimeout = 4000; // milliseconds
 
-    private HttpClient client;
+    private CloseableHttpClient client;
     private Gson dataMarshaller;
 
     /**
@@ -56,11 +56,7 @@ public class Pusher {
         this.key = key;
         this.secret = secret;
 
-        this.client = HttpClientBuilder.create()
-                .setConnectionManager(new PoolingHttpClientConnectionManager())
-                .setConnectionReuseStrategy(new DefaultConnectionReuseStrategy())
-                .setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
-                .build();
+        this.configureHttpClient(defaultHttpClientBuilder());
 
         this.dataMarshaller = new Gson();
     }
@@ -114,10 +110,57 @@ public class Pusher {
     }
 
     /**
+     * Returns an HttpClientBuilder with the settings used by default applied. You may apply
+     * further configuration (for example an HTTP proxy), override existing configuration
+     * (for example, the connection manager which handles connection pooling for reuse) and
+     * then call {@link #configureHttpClient(HttpClientBuilder)} to have this configuration
+     * applied to all subsequent calls.
+     */
+    public static HttpClientBuilder defaultHttpClientBuilder() {
+        return HttpClientBuilder.create()
+                .setConnectionManager(new PoolingHttpClientConnectionManager())
+                .setConnectionReuseStrategy(new DefaultConnectionReuseStrategy())
+                .setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
+                .disableRedirectHandling();
+    }
+
+    /**
+     * Configure the HttpClient instance which will be used for making calls to the Pusher API.
+     *
+     * This method allows almost complete control over all aspects of the HTTP client, including
+     *  - proxy host
+     *  - connection pooling and reuse strategies
+     *  - automatic retry and backoff strategies
+     *
+     * It is *strongly* recommended that you take the value of {@link #defaultHttpClientBuilder()}
+     * as a base, apply your custom config to that and then pass the builder in here, to ensure
+     * that sensible defaults for configuration areas you are not setting explicitly are retained.
+     *
+     * e.g.
+     * <code>
+     *     pusher.configureHttpClient(
+     *         Pusher.defaultHttpClientBuilder()
+     *               .setProxy(new HttpHost("proxy.example.com"))
+     *               .disableAutomaticRetries()
+     *     );
+     * </code>
+     */
+    public void configureHttpClient(final HttpClientBuilder builder) {
+        try {
+            if (client != null) client.close();
+        }
+        catch (IOException e) {
+            // Not a lot useful we can do here
+        }
+
+        this.client = builder.build();
+    }
+
+    /**
      * Publish a message to a single channel.
      *
      * The message data should be a POJO, which will be serialised to JSON for submission.
-     * Use #setGsonSerialiser(Gson) to control the serialisation
+     * Use {@link #setGsonSerialiser(Gson)} to control the serialisation
      *
      * Note that if you do not wish to create classes specifically for the purpose of specifying
      * the message payload, use Map<String, Object>. These maps will nest just fine.
@@ -195,7 +238,7 @@ public class Pusher {
     }
 
     // Inject mock for testing
-    void setHttpClient(final HttpClient client) {
+    void setHttpClient(final CloseableHttpClient client) {
         this.client = client;
     }
 }
