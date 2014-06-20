@@ -350,4 +350,18 @@ public class Pusher {
         final String signature = SignatureUtil.sign(socketId + ":" + channel + ":" + channelData, secret);
         return BODY_SERIALISER.toJson(new AuthData(key, signature, channelData));
     }
+
+    /*
+     * WEBHOOK VALIDATION
+     */
+
+    public Validity validateWebhookSignature(final String xPusherKeyHeader, final String xPusherSignatureHeader, final String body) {
+        if (!xPusherKeyHeader.trim().equals(key)) {
+            // We can't validate the signature, because it was signed with a different key to the one we were initialised with.
+            return Validity.SIGNED_WITH_WRONG_KEY;
+        }
+
+        final String recalculatedSignature = SignatureUtil.sign(body, secret);
+        return xPusherSignatureHeader.trim().equals(recalculatedSignature) ? Validity.VALID : Validity.INVALID;
+    }
 }
