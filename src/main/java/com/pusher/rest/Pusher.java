@@ -255,7 +255,7 @@ public class Pusher {
      */
     public Result get(final String path, final Map<String, String> parameters) {
         final String fullPath = "/apps/" + appId + path;
-        final URI uri = SignedRequest.uri("GET", scheme, host, fullPath, null, key, secret, parameters);
+        final URI uri = SignatureUtil.uri("GET", scheme, host, fullPath, null, key, secret, parameters);
 
         return httpCall(new HttpGet(uri));
     }
@@ -273,7 +273,7 @@ public class Pusher {
      */
     public Result post(final String path, final String body) {
         final String fullPath = "/apps/" + appId + path;
-        final URI uri = SignedRequest.uri("POST", scheme, host, fullPath, body, key, secret, Collections.<String, String>emptyMap());
+        final URI uri = SignatureUtil.uri("POST", scheme, host, fullPath, body, key, secret, Collections.<String, String>emptyMap());
 
         final StringEntity bodyEntity = new StringEntity(body, "UTF-8");
         bodyEntity.setContentType("application/json");
@@ -326,7 +326,7 @@ public class Pusher {
             throw new IllegalArgumentException("Authentication is only applicable to private and presence channels");
         }
 
-        final String signature = SignedRequest.sign(socketId + ":" + channel, secret);
+        final String signature = SignatureUtil.sign(socketId + ":" + channel, secret);
         return BODY_SERIALISER.toJson(new AuthData(key, signature));
     }
 
@@ -347,7 +347,7 @@ public class Pusher {
         }
 
         final String channelData = BODY_SERIALISER.toJson(user);
-        final String signature = SignedRequest.sign(socketId + ":" + channel + ":" + channelData, secret);
+        final String signature = SignatureUtil.sign(socketId + ":" + channel + ":" + channelData, secret);
         return BODY_SERIALISER.toJson(new AuthData(key, signature, channelData));
     }
 }

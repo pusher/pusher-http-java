@@ -10,14 +10,14 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class SignedRequestTest {
+public class SignatureUtilTest {
 
     @Test
     public void stringToSignFields() {
-        assertThat(SignedRequest.buildSignatureString("POST", "/a/path", Collections.singletonMap("k", "v")),
+        assertThat(SignatureUtil.buildSignatureString("POST", "/a/path", Collections.singletonMap("k", "v")),
                 is("POST\n/a/path\nk=v"));
 
-        assertThat(SignedRequest.buildSignatureString("GET", "/a/nother/path", Collections.singletonMap("K", "V")),
+        assertThat(SignatureUtil.buildSignatureString("GET", "/a/nother/path", Collections.singletonMap("K", "V")),
                 is("GET\n/a/nother/path\nK=V"));
     }
 
@@ -35,7 +35,7 @@ public class SignedRequestTest {
         Arrays.sort(sortedOrder);
         assertThat(defaultOrder, not(equalTo(sortedOrder)));
 
-        String toSign = SignedRequest.buildSignatureString("POST", "/", params);
+        String toSign = SignatureUtil.buildSignatureString("POST", "/", params);
         assertThat(toSign, containsString("a=v1&bat=v2&car=v3&cat=v4"));
     }
 
