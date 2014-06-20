@@ -42,9 +42,9 @@ public class Pusher {
 
     /**
      * Construct an instance of the Pusher object through which you may interact with the Pusher API.
-     *
+     * <p>
      * The parameters to use are found on your dashboard at https://app.pusher.com and are specific per App.
-     *
+     * <p>
      * @param appId The ID of the App you will to interact with.
      * @param key The App Key, the same key you give to websocket clients to identify your app when they connect to Pusher.
      * @param secret The App Secret. Used to sign requests to the API, this should be treated as sensitive and not distributed.
@@ -70,9 +70,9 @@ public class Pusher {
 
     /**
      * Set the API endpoint host.
-     *
+     * <p>
      * For testing or specifying an alternative cluster.
-     *
+     * <p>
      * Default: api.pusherapp.com
      */
     public void setHost(final String host) {
@@ -83,11 +83,11 @@ public class Pusher {
 
     /**
      * Set whether to use a secure connection to the API (SSL).
-     *
+     * <p>
      * Authentication is secure even without this option, requests cannot be faked or replayed with access
      * to their plain text, a secure connection is only required if the requests or responses contain
      * sensitive information.
-     *
+     * <p>
      * Default: false
      */
     public void setEncrypted(final boolean encrypted) {
@@ -96,7 +96,7 @@ public class Pusher {
 
     /**
      * Set the request timeout in milliseconds
-     *
+     * <p>
      * Default 4000
      */
     public void setRequestTimeout(final int requestTimeout) {
@@ -104,8 +104,9 @@ public class Pusher {
     }
 
     /**
-     * Set the Gson instance used to marshall Objects passed to #trigger
-     *
+     * Set the Gson instance used to marshall Objects passed to {@link #trigger(List, String, Object)}
+     * and friends.
+     * <p>
      * The library marshalls the objects provided to JSON using the Gson library
      * (see https://code.google.com/p/google-gson/ for more details). By providing an instance
      * here, you may exert control over the marshalling, for example choosing how Java property
@@ -122,6 +123,8 @@ public class Pusher {
      * (for example, the connection manager which handles connection pooling for reuse) and
      * then call {@link #configureHttpClient(HttpClientBuilder)} to have this configuration
      * applied to all subsequent calls.
+     *
+     * @see #configureHttpClient(HttpClientBuilder)
      */
     public static HttpClientBuilder defaultHttpClientBuilder() {
         return HttpClientBuilder.create()
@@ -133,24 +136,27 @@ public class Pusher {
 
     /**
      * Configure the HttpClient instance which will be used for making calls to the Pusher API.
-     *
+     * <p>
      * This method allows almost complete control over all aspects of the HTTP client, including
-     *  - proxy host
-     *  - connection pooling and reuse strategies
-     *  - automatic retry and backoff strategies
-     *
-     * It is *strongly* recommended that you take the value of {@link #defaultHttpClientBuilder()}
+     * <ul>
+     * <li>proxy host</li>
+     * <li>connection pooling and reuse strategies</li>
+     * <li>automatic retry and backoff strategies</li>
+     * </ul>
+     * It is <strong>strongly</strong> recommended that you take the value of {@link #defaultHttpClientBuilder()}
      * as a base, apply your custom config to that and then pass the builder in here, to ensure
      * that sensible defaults for configuration areas you are not setting explicitly are retained.
-     *
+     * <p>
      * e.g.
-     * <code>
+     * <pre>
      * pusher.configureHttpClient(
      *     Pusher.defaultHttpClientBuilder()
      *           .setProxy(new HttpHost("proxy.example.com"))
      *           .disableAutomaticRetries()
      * );
-     * </code>
+     * </pre>
+     *
+     * @see #defaultHttpClientBuilder()
      */
     public void configureHttpClient(final HttpClientBuilder builder) {
         try {
@@ -166,20 +172,19 @@ public class Pusher {
     /**
      * This method provides an override point if the default Gson based serialisation is absolutely
      * unsuitable for your use case, even with customisation of the Gson instance doing the serialisation.
-     *
+     * <p>
      * For example, in the simplest case, you might already have your data pre-serialised and simply want
      * to elide the default serialisation:
-     *
-     * <code>
+     * <pre>
      * Pusher pusher = new Pusher(appId, key, secret) {
-     *     @Override
+     *     &commat;Override
      *     protected String serialise(final Object data) {
      *         return (String)data;
      *     }
      * };
      *
      * pusher.trigger("my-channel", "my-event", "{\"my-data\":\"my-value\"}");
-     * </code>
+     * </pre>
      */
     protected String serialise(final Object data) {
         return dataMarshaller.toJson(data);
@@ -191,12 +196,12 @@ public class Pusher {
 
     /**
      * Publish a message to a single channel.
-     *
+     * <p>
      * The message data should be a POJO, which will be serialised to JSON for submission.
      * Use {@link #setGsonSerialiser(Gson)} to control the serialisation
-     *
+     * <p>
      * Note that if you do not wish to create classes specifically for the purpose of specifying
-     * the message payload, use Map<String, Object>. These maps will nest just fine.
+     * the message payload, use Map&lt;String, Object&gt;. These maps will nest just fine.
      */
     public Result trigger(final String channel, final String eventName, final Object data) {
         return trigger(channel, eventName, data, null);
@@ -233,12 +238,12 @@ public class Pusher {
 
     /**
      * Make a generic REST call to the Pusher API.
-     *
+     * <p>
      * See: http://pusher.com/docs/rest_api
-     *
+     * <p>
      * Parameters should be a map of query parameters for the REST call, and may be null
      * if none are required.
-     *
+     * <p>
      * NOTE: the path specified here is relative to that of your app. For example, to access
      * the channel list for your app, simply pass "/channels". Do not include the "/apps/[appId]"
      * at the beginning of the path.
@@ -252,11 +257,11 @@ public class Pusher {
 
     /**
      * Make a generic REST call to the Pusher API.
-     *
+     * <p>
      * The body should be a UTF-8 encoded String
-     *
+     * <p>
      * See: http://pusher.com/docs/rest_api
-     *
+     * <p>
      * NOTE: the path specified here is relative to that of your app. For example, to access
      * the channel list for your app, simply pass "/channels". Do not include the "/apps/[appId]"
      * at the beginning of the path.
