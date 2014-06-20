@@ -1,7 +1,6 @@
 package com.pusher.rest;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
@@ -18,7 +17,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.pusher.rest.Result.Status;
+import com.pusher.rest.data.Result;
+import com.pusher.rest.data.Result.Status;
 
 /**
  * Tests which use a local server to check response handling

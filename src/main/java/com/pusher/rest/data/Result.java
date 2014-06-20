@@ -1,12 +1,6 @@
-package com.pusher.rest;
+package com.pusher.rest.data;
 
-import static com.pusher.rest.Result.Status.AUTHENTICATION_ERROR;
-import static com.pusher.rest.Result.Status.CLIENT_ERROR;
-import static com.pusher.rest.Result.Status.MESSAGE_QUOTA_EXCEEDED;
-import static com.pusher.rest.Result.Status.NOT_FOUND;
-import static com.pusher.rest.Result.Status.OK;
-import static com.pusher.rest.Result.Status.SERVER_ERROR;
-import static com.pusher.rest.Result.Status.UNKNOWN_ERROR;
+import static com.pusher.rest.data.Result.Status.*;
 
 import java.io.IOException;
 

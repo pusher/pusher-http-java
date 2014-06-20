@@ -52,31 +52,42 @@ public class SignedRequest {
         catch (final URISyntaxException e) {
             throw new RuntimeException("Could not build URI", e);
         }
-        catch (final InvalidKeyException e) {
-            /// We validate this when the key is first provided, so we should never encounter it here.
-            throw new RuntimeException("Invalid secret key", e);
+    }
+
+    private static String bodyMd5(final String body) {
+        try {
+            final MessageDigest md = MessageDigest.getInstance("MD5");
+            final byte[] digest = md.digest(body.getBytes("UTF-8"));
+            return Hex.encodeHexString(digest);
         }
-        // If either of these doesn't exist, we're pretty much out of luck.
+        // If this doesn't exist, we're pretty much out of luck.
         catch (final NoSuchAlgorithmException e) {
-            throw new RuntimeException("The Pusher REST client requires MD5 and HmacSHA256 support", e);
+            throw new RuntimeException("The Pusher REST client requires MD5 support", e);
         }
         catch (final UnsupportedEncodingException e) {
             throw new RuntimeException("The Pusher REST client needs UTF-8 support", e);
         }
     }
 
-    private static String bodyMd5(final String body) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        final MessageDigest md = MessageDigest.getInstance("MD5");
-        final byte[] digest = md.digest(body.getBytes("UTF-8"));
-        return Hex.encodeHexString(digest);
-    }
+    public static String sign(final String input, final String secret) {
+        try {
+            final Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(new SecretKeySpec(secret.getBytes(), "SHA256"));
 
-    private static String sign(final String input, final String secret) throws NoSuchAlgorithmException, InvalidKeyException, IllegalStateException, UnsupportedEncodingException {
-        final Mac mac = Mac.getInstance("HmacSHA256");
-        mac.init(new SecretKeySpec(secret.getBytes(), "SHA256"));
-
-        final byte[] digest = mac.doFinal(input.getBytes("UTF-8"));
-        return Hex.encodeHexString(digest);
+            final byte[] digest = mac.doFinal(input.getBytes("UTF-8"));
+            return Hex.encodeHexString(digest);
+        }
+        catch (final InvalidKeyException e) {
+            /// We validate this when the key is first provided, so we should never encounter it here.
+            throw new RuntimeException("Invalid secret key", e);
+        }
+        // If either of these doesn't exist, we're pretty much out of luck.
+        catch (final NoSuchAlgorithmException e) {
+            throw new RuntimeException("The Pusher REST client requires HmacSHA256 support", e);
+        }
+        catch (final UnsupportedEncodingException e) {
+            throw new RuntimeException("The Pusher REST client needs UTF-8 support", e);
+        }
     }
 
     // Visible for testing

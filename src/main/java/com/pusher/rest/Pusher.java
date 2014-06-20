@@ -22,6 +22,11 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import com.pusher.rest.data.AuthData;
+import com.pusher.rest.data.PresenceUser;
+import com.pusher.rest.data.Result;
+import com.pusher.rest.data.TriggerData;
 import com.pusher.rest.util.Prerequisites;
 
 public class Pusher {
@@ -191,7 +196,7 @@ public class Pusher {
     }
 
     /*
-     * APPLICATION
+     * REST
      */
 
     /**
@@ -299,5 +304,50 @@ public class Pusher {
         catch (final IOException e) {
             return Result.fromException(e);
         }
+    }
+
+    /*
+     * CHANNEL AUTHENTICATION
+     */
+
+    /**
+     * Generate authentication response to authorise a user on a private channel
+     *
+     * The return value is the complete body which should be returned to a client requesting authorisation.
+     */
+    public String authenticate(final String channel, final String socketId) {
+        Prerequisites.nonNull("socketId", socketId);
+        Prerequisites.nonNull("channel", channel);
+
+        if (channel.startsWith("presence-")) {
+            throw new IllegalArgumentException("This method is for private channels, use authenticate(String, String, PresenceUser) to authenticate for a presence channel.");
+        }
+        if (!channel.startsWith("private-")) {
+            throw new IllegalArgumentException("Authentication is only applicable to private and presence channels");
+        }
+
+        final String signature = SignedRequest.sign(socketId + ":" + channel, secret);
+        return BODY_SERIALISER.toJson(new AuthData(key, signature));
+    }
+
+    /**
+     * Generate authentication response to authorise a user on a private channel
+     *
+     * The return value is the complete body which should be returned to a client requesting authorisation.
+     */
+    public String authenticate(final String channel, final String socketId, final PresenceUser user) {
+        Prerequisites.nonNull("user", user);
+        Prerequisites.nonNull("channel", channel);
+
+        if (channel.startsWith("private-")) {
+            throw new IllegalArgumentException("This method is for presence channels, use authenticate(String, String) to authenticate for a private channel.");
+        }
+        if (!channel.startsWith("presence-")) {
+            throw new IllegalArgumentException("Authentication is only applicable to private and presence channels");
+        }
+
+        final String channelData = BODY_SERIALISER.toJson(user);
+        final String signature = SignedRequest.sign(socketId + ":" + channel + ":" + channelData, secret);
+        return BODY_SERIALISER.toJson(new AuthData(key, signature, channelData));
     }
 }
