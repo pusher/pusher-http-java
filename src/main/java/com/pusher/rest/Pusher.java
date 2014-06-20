@@ -64,6 +64,10 @@ public class Pusher {
         this.dataMarshaller = new Gson();
     }
 
+    /*
+     * CONFIG
+     */
+
     /**
      * Set the API endpoint host.
      *
@@ -141,11 +145,11 @@ public class Pusher {
      *
      * e.g.
      * <code>
-     *     pusher.configureHttpClient(
-     *         Pusher.defaultHttpClientBuilder()
-     *               .setProxy(new HttpHost("proxy.example.com"))
-     *               .disableAutomaticRetries()
-     *     );
+     * pusher.configureHttpClient(
+     *     Pusher.defaultHttpClientBuilder()
+     *           .setProxy(new HttpHost("proxy.example.com"))
+     *           .disableAutomaticRetries()
+     * );
      * </code>
      */
     public void configureHttpClient(final HttpClientBuilder builder) {
@@ -158,6 +162,32 @@ public class Pusher {
 
         this.client = builder.build();
     }
+
+    /**
+     * This method provides an override point if the default Gson based serialisation is absolutely
+     * unsuitable for your use case, even with customisation of the Gson instance doing the serialisation.
+     *
+     * For example, in the simplest case, you might already have your data pre-serialised and simply want
+     * to elide the default serialisation:
+     *
+     * <code>
+     * Pusher pusher = new Pusher(appId, key, secret) {
+     *     @Override
+     *     protected String serialise(final Object data) {
+     *         return (String)data;
+     *     }
+     * };
+     *
+     * pusher.trigger("my-channel", "my-event", "{\"my-data\":\"my-value\"}");
+     * </code>
+     */
+    protected String serialise(final Object data) {
+        return dataMarshaller.toJson(data);
+    }
+
+    /*
+     * APPLICATION
+     */
 
     /**
      * Publish a message to a single channel.
@@ -264,13 +294,5 @@ public class Pusher {
         catch (final IOException e) {
             return Result.fromException(e);
         }
-    }
-
-    /**
-     * This method provides an override point if the default Gson based serialisation is absolutely
-     * unsuitable for your use case, even with customisation of the Gson instance doing the serialisation.
-     */
-    protected String serialise(final Object data) {
-        return dataMarshaller.toJson(data);
     }
 }
