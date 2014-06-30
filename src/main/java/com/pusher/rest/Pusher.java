@@ -312,7 +312,7 @@ public class Pusher {
 
     /**
      * Generate authentication response to authorise a user on a private channel
-     *
+     * <p>
      * The return value is the complete body which should be returned to a client requesting authorisation.
      */
     public String authenticate(final String channel, final String socketId) {
@@ -332,7 +332,7 @@ public class Pusher {
 
     /**
      * Generate authentication response to authorise a user on a private channel
-     *
+     * <p>
      * The return value is the complete body which should be returned to a client requesting authorisation.
      */
     public String authenticate(final String channel, final String socketId, final PresenceUser user) {
