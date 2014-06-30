@@ -8,7 +8,7 @@ import org.apache.http.client.ClientProtocolException;
 
 public class Result {
     public enum Status {
-        OK(false), // No need!
+        SUCCESS(false), // No need!
         CLIENT_ERROR(false),
         AUTHENTICATION_ERROR(false),
         MESSAGE_QUOTA_EXCEEDED(false),
@@ -46,7 +46,7 @@ public class Result {
         final Status status;
         switch (statusCode) {
         case 200:
-            status = OK;
+            status = SUCCESS;
             break;
         case 400:
             status = CLIENT_ERROR;

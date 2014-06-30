@@ -63,7 +63,7 @@ public class PusherHttpTest {
         responseBody = "{}";
 
         Result result = p.httpCall(request);
-        assertThat(result.getStatus(), is(Status.OK));
+        assertThat(result.getStatus(), is(Status.SUCCESS));
         assertThat(result.getMessage(), is(responseBody));
     }
 
