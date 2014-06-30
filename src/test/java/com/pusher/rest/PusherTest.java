@@ -1,9 +1,10 @@
 package com.pusher.rest;
 
-import static com.pusher.rest.util.Matchers.dataField;
+import static com.pusher.rest.util.Matchers.field;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +62,7 @@ public class PusherTest {
     @Test
     public void serialisePojo() throws IOException {
         context.checking(new Expectations() {{
-            oneOf(httpClient).execute(with(dataField("{\"aString\":\"value\",\"aNumber\":42}")));
+            oneOf(httpClient).execute(with(field("data", "{\"aString\":\"value\",\"aNumber\":42}")));
         }});
 
         p.trigger("my-channel", "event", new MyPojo());
@@ -72,7 +73,7 @@ public class PusherTest {
         p.setGsonSerialiser(new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create());
 
         context.checking(new Expectations() {{
-            oneOf(httpClient).execute(with(dataField("{\"a-string\":\"value\",\"a-number\":42}")));
+            oneOf(httpClient).execute(with(field("data", "{\"a-string\":\"value\",\"a-number\":42}")));
         }});
 
         p.trigger("my-channel", "event", new MyPojo());
@@ -88,7 +89,7 @@ public class PusherTest {
         };
 
         context.checking(new Expectations() {{
-            oneOf(httpClient).execute(with(dataField("this is my strong data")));
+            oneOf(httpClient).execute(with(field("data", "this is my strong data")));
         }});
 
         p.trigger("my-channel", "event", "this is my string data");
@@ -97,7 +98,7 @@ public class PusherTest {
     @Test
     public void mapShouldBeASuitableObjectForData() throws IOException {
         context.checking(new Expectations() {{
-            oneOf(httpClient).execute(with(dataField("{\"name\":\"value\"}")));
+            oneOf(httpClient).execute(with(field("data", "{\"name\":\"value\"}")));
         }});
 
         p.trigger("my-channel", "event", Collections.singletonMap("name", "value"));
@@ -117,9 +118,37 @@ public class PusherTest {
 
         final String expectedData = "{\"k1\":\"v1\",\"k2\":{\"k3\":\"v3\",\"k4\":[\"v4\",\"v5\"]}}";
         context.checking(new Expectations() {{
-            oneOf(httpClient).execute(with(dataField(expectedData)));
+            oneOf(httpClient).execute(with(field("data", expectedData)));
         }});
 
         p.trigger("my-channel", "event", data);
+    }
+
+    @Test
+    public void channelList() throws Exception {
+        final List<String> channels = Arrays.asList(new String[] { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten" });
+
+        context.checking(new Expectations() {{
+            oneOf(httpClient).execute(with(field("channels", channels)));
+        }});
+
+        p.trigger(channels, "event", Collections.singletonMap("name", "value"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void channelListLimitOverLimit() {
+        final List<String> channels = Arrays.asList(new String[] { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven" });
+
+        p.trigger(channels, "event", Collections.singletonMap("name", "value"));
+    }
+
+    @Test
+    public void socketIdExclusion() throws Exception {
+        final String socketId = "12345.6789";
+        context.checking(new Expectations() {{
+            oneOf(httpClient).execute(with(field("socket_id", socketId)));
+        }});
+
+        p.trigger("channel", "event", Collections.singletonMap("name", "value"), socketId);
     }
 }

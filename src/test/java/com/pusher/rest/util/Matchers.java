@@ -12,18 +12,19 @@ import com.google.gson.Gson;
 
 public class Matchers {
 
-    public static Matcher<HttpPost> dataField(final String expected) {
+    public static <T> Matcher<HttpPost> field(final String fieldName, final T expected) {
         return new TypeSafeDiagnosingMatcher<HttpPost>() {
             @Override
             public void describeTo(Description description) {
-                description.appendText("HTTP request with data [" + expected + "] encoded in body");
+                description.appendText("HTTP request with field [" + fieldName + "], value [" + expected + "] in JSON body");
             }
 
             @Override
             public boolean matchesSafely(HttpPost item, Description mismatchDescription) {
                 try {
-                    String actual = retrieveData(retrieveBody(item));
-                    mismatchDescription.appendText("Expected data [" + expected + "], but received [" + actual + "]");
+                    @SuppressWarnings("unchecked")
+                    T actual = (T)new Gson().fromJson(retrieveBody(item), Map.class).get(fieldName);
+                    mismatchDescription.appendText("value was [" + actual + "]");
                     return expected.equals(actual);
                 }
                 catch (Exception e) {
@@ -55,10 +56,6 @@ public class Matchers {
         };
     }
 
-
-    private static String retrieveData(String body) {
-        return (String)new Gson().fromJson(body, Map.class).get("data");
-    }
 
     private static String retrieveBody(HttpPost e) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
