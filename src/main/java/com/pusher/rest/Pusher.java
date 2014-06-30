@@ -76,7 +76,7 @@ public class Pusher {
     /**
      * Set the API endpoint host.
      * <p>
-     * For testing or specifying an alternative cluster.
+     * For testing or specifying an alternative cluster. See also {@link #setCluster(String)} for the latter.
      * <p>
      * Default: api.pusherapp.com
      */
@@ -84,6 +84,19 @@ public class Pusher {
         Prerequisites.nonNull("host", host);
 
         this.host = host;
+    }
+
+    /**
+     * Set the Pusher cluster to target.
+     * <p>
+     * For Specifying an alternative cluster.
+     * <p>
+     * See also {@link #setHost(String)} for targetting an arbitrary endpoint.
+     */
+    public void setCluster(final String cluster) {
+        Prerequisites.nonNull("cluster", cluster);
+
+        this.host = "api-" + cluster + ".pusher.com";
     }
 
     /**
