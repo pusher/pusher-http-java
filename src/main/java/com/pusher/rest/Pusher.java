@@ -319,6 +319,14 @@ public class Pusher {
         }
     }
 
+    public URI signedUri(final String method, final String path, final String body) {
+        return signedUri(method, path, body, Collections.<String, String>emptyMap());
+    }
+
+    public URI signedUri(final String method, final String path, final String body, final Map<String, String> parameters) {
+        return SignatureUtil.uri(method, scheme, host, path, body, key, secret, parameters);
+    }
+
     /*
      * CHANNEL AUTHENTICATION
      */
