@@ -32,6 +32,34 @@ import com.pusher.rest.data.TriggerData;
 import com.pusher.rest.data.Validity;
 import com.pusher.rest.util.Prerequisites;
 
+/**
+ * A library for interacting with the Pusher REST API.
+ * <p>
+ * See http://github.com/pusher/pusher-rest-java for an overview
+ * <p>
+ * Essentially:
+ * <pre>
+ * // Init
+ * Pusher pusher = new Pusher(APP_ID, KEY, SECRET);
+ * // Publish
+ * Result triggerResult = pusher.trigger("my-channel", "my-eventname", myPojoForSerialisation);
+ * if (triggerResult.getStatus() != Status.SUCCESS) {
+ *   if (triggerResult.getStatus().shouldRetry()) {
+ *     // Temporary, let's schedule a retry
+ *   }
+ *   else {
+ *     // Something is wrong with our request
+ *   }
+ * }
+ *
+ * // Query
+ * Result channelListResult = pusher.get("/channels");
+ * if (channelListResult.getStatus() == Status.SUCCESS) {
+ *   String channelListAsJson = channelListResult.getMessage();
+ *   // etc
+ * }
+ * </pre>
+ */
 public class Pusher {
     private static final Gson BODY_SERIALISER = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)

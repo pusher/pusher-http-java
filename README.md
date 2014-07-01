@@ -62,7 +62,7 @@ pusher.setRequestTimeout(10000);
 
 #### SSL
 
-HTTPS can be used as transport by calling `setSecure(true)`. Note that your credentials are not exposed on an insecure connection, however the contents of your messages are. Use this option if your messages themselves are sensitive.
+HTTPS can be used as transport by calling `setEncrypted(true)`. Note that your credentials are not exposed on an unencrypted connection, however the contents of your messages are. Use this option if your messages themselves are sensitive.
 
 #### Advanced HTTP configuration
 
