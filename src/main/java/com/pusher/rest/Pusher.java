@@ -303,6 +303,7 @@ public class Pusher {
         Prerequisites.nonNull("data", data);
         Prerequisites.maxLength("channels", 10, channels);
         Prerequisites.noNullMembers("channels", channels);
+        Prerequisites.validChannelNames(channels);
 
         final String body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
 
@@ -417,6 +418,7 @@ public class Pusher {
     public String authenticate(final String socketId, final String channel) {
         Prerequisites.nonNull("socketId", socketId);
         Prerequisites.nonNull("channel", channel);
+        Prerequisites.validChannelName(channel);
 
         if (channel.startsWith("presence-")) {
             throw new IllegalArgumentException("This method is for private channels, use authenticate(String, String, PresenceUser) to authenticate for a presence channel.");
@@ -438,6 +440,7 @@ public class Pusher {
         Prerequisites.nonNull("socketId", socketId);
         Prerequisites.nonNull("channel", channel);
         Prerequisites.nonNull("user", user);
+        Prerequisites.validChannelName(channel);
 
         if (channel.startsWith("private-")) {
             throw new IllegalArgumentException("This method is for presence channels, use authenticate(String, String) to authenticate for a private channel.");

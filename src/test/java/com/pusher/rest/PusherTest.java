@@ -165,4 +165,9 @@ public class PusherTest {
     public void reservedParameter() {
         p.get("/channels", Collections.singletonMap("auth_timestamp", "anything"));
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void invalidChannelName() {
+        p.trigger("channûel", "my-event", Collections.singletonMap("name", "value"));
+    }
 }
