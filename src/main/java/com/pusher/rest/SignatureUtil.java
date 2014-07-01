@@ -32,7 +32,9 @@ public class SignatureUtil {
             allParams.put("auth_key", key);
             allParams.put("auth_version", "1.0");
             allParams.put("auth_timestamp", new Long(System.currentTimeMillis() / 1000).toString());
-            allParams.put("body_md5", bodyMd5(body));
+            if (body != null) {
+                allParams.put("body_md5", bodyMd5(body));
+            }
 
             // This is where the auth gets a bit weird. The query params for the request must include
             // the auth signature which is a signature over all the params except itself.

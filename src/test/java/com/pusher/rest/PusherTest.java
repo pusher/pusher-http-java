@@ -1,6 +1,6 @@
 package com.pusher.rest;
 
-import static com.pusher.rest.util.Matchers.field;
+import static com.pusher.rest.util.Matchers.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -150,5 +150,14 @@ public class PusherTest {
         }});
 
         p.trigger("channel", "event", Collections.singletonMap("name", "value"), socketId);
+    }
+
+    @Test
+    public void genericGet() throws Exception {
+        context.checking(new Expectations() {{
+            oneOf(httpClient).execute(with(path("/apps/" + APP_ID + "/channels")));
+        }});
+
+        p.get("/channels");
     }
 }

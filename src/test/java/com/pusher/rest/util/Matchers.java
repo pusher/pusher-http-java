@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
@@ -24,6 +25,26 @@ public class Matchers {
                 try {
                     @SuppressWarnings("unchecked")
                     T actual = (T)new Gson().fromJson(retrieveBody(item), Map.class).get(fieldName);
+                    mismatchDescription.appendText("value was [" + actual + "]");
+                    return expected.equals(actual);
+                }
+                catch (Exception e) {
+                    return false;
+                }
+            }
+        };
+    }
+    public static Matcher<HttpRequestBase> path(final String expected) {
+        return new TypeSafeDiagnosingMatcher<HttpRequestBase>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("HTTP request with path [" + expected + "]");
+            }
+
+            @Override
+            public boolean matchesSafely(HttpRequestBase item, Description mismatchDescription) {
+                try {
+                    String actual = item.getURI().getPath();
                     mismatchDescription.appendText("value was [" + actual + "]");
                     return expected.equals(actual);
                 }
