@@ -286,6 +286,19 @@ public class Pusher {
      * <p>
      * See: http://pusher.com/docs/rest_api
      * <p>
+     * NOTE: the path specified here is relative to that of your app. For example, to access
+     * the channel list for your app, simply pass "/channels". Do not include the "/apps/[appId]"
+     * at the beginning of the path.
+     */
+    public Result get(final String path) {
+        return get(path, Collections.<String, String>emptyMap());
+    }
+
+    /**
+     * Make a generic REST call to the Pusher API.
+     * <p>
+     * See: http://pusher.com/docs/rest_api
+     * <p>
      * Parameters should be a map of query parameters for the REST call, and may be null
      * if none are required.
      * <p>
