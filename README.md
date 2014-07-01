@@ -123,7 +123,7 @@ pusher.trigger(channel, event, data, "1302.1081607");
 To authorise your users to access private channels on Pusher, you can use the `authenticate` method. This method returns the response body which should be returned to the user requesting authentication.
 
 ```java
-String authBody = pusher.authenticate(channel, socketId);
+String authBody = pusher.authenticate(socketId, channel);
 ```
 
 For more information see: <http://pusher.com/docs/authenticating_users>
@@ -138,7 +138,7 @@ Map<String, String> userInfo = new HashMap<>();
 userInfo.add("name", "Phil Leggetter");
 userInfo.add("twitterId", "@leggetter");
 
-String authBody = pusher.auth(channel, socketId, new PresenceUser(userId, userInfo));
+String authBody = pusher.auth(socketId, channel, new PresenceUser(userId, userInfo));
 ```
 
 For more information see: <http://pusher.com/docs/authenticating_users>

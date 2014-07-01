@@ -414,7 +414,7 @@ public class Pusher {
      * <p>
      * The return value is the complete body which should be returned to a client requesting authorisation.
      */
-    public String authenticate(final String channel, final String socketId) {
+    public String authenticate(final String socketId, final String channel) {
         Prerequisites.nonNull("socketId", socketId);
         Prerequisites.nonNull("channel", channel);
 
@@ -434,7 +434,7 @@ public class Pusher {
      * <p>
      * The return value is the complete body which should be returned to a client requesting authorisation.
      */
-    public String authenticate(final String channel, final String socketId, final PresenceUser user) {
+    public String authenticate(final String socketId, final String channel, final PresenceUser user) {
         Prerequisites.nonNull("socketId", socketId);
         Prerequisites.nonNull("channel", channel);
         Prerequisites.nonNull("user", user);
