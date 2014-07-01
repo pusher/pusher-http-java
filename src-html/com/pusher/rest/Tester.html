@@ -13,14 +13,22 @@
 <FONT color="green">010</FONT>        private static final String APP_ID = "58322";<a name="line.10"></a>
 <FONT color="green">011</FONT>    <a name="line.11"></a>
 <FONT color="green">012</FONT>        public static void main(String[] argv) throws InterruptedException {<a name="line.12"></a>
-<FONT color="green">013</FONT>            Pusher p = new Pusher(APP_ID, KEY, SECRET);<a name="line.13"></a>
-<FONT color="green">014</FONT>    <a name="line.14"></a>
-<FONT color="green">015</FONT>            p.trigger("my-channel", "single-channel-test-event", Collections.singletonMap("name", "value"));<a name="line.15"></a>
-<FONT color="green">016</FONT>            p.trigger(Arrays.asList(new String[] { "my-channel", "my-second-channel" }), "multi-channel-test-event", Collections.singletonMap("name", "value"));<a name="line.16"></a>
-<FONT color="green">017</FONT>    <a name="line.17"></a>
-<FONT color="green">018</FONT>            System.out.println(p.get("/channels").getMessage());<a name="line.18"></a>
-<FONT color="green">019</FONT>        }<a name="line.19"></a>
-<FONT color="green">020</FONT>    }<a name="line.20"></a>
+<FONT color="green">013</FONT>            final Pusher p = new Pusher(APP_ID, KEY, SECRET);<a name="line.13"></a>
+<FONT color="green">014</FONT>            p.setEncrypted(false);<a name="line.14"></a>
+<FONT color="green">015</FONT>    <a name="line.15"></a>
+<FONT color="green">016</FONT>            for (int i = 0; i &lt; 10; i++) {<a name="line.16"></a>
+<FONT color="green">017</FONT>                new Thread(new Runnable() {<a name="line.17"></a>
+<FONT color="green">018</FONT>                    @Override<a name="line.18"></a>
+<FONT color="green">019</FONT>                    public void run() {<a name="line.19"></a>
+<FONT color="green">020</FONT>                        for (int j = 0; j &lt; 10; j++) {<a name="line.20"></a>
+<FONT color="green">021</FONT>                            p.trigger("my-channel", "single-channel-test-event", Collections.singletonMap("name", "value"));<a name="line.21"></a>
+<FONT color="green">022</FONT>                            p.trigger(Arrays.asList(new String[] { "my-channel", "my-second-channel" }), "multi-channel-test-event", Collections.singletonMap("name", "value"));<a name="line.22"></a>
+<FONT color="green">023</FONT>                        }<a name="line.23"></a>
+<FONT color="green">024</FONT>                    }<a name="line.24"></a>
+<FONT color="green">025</FONT>                }).start();<a name="line.25"></a>
+<FONT color="green">026</FONT>            }<a name="line.26"></a>
+<FONT color="green">027</FONT>        }<a name="line.27"></a>
+<FONT color="green">028</FONT>    }<a name="line.28"></a>
 
 
 
