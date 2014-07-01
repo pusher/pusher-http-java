@@ -1,0 +1,86 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    package com.pusher.rest;<a name="line.1"></a>
+<FONT color="green">002</FONT>    <a name="line.2"></a>
+<FONT color="green">003</FONT>    import java.util.Arrays;<a name="line.3"></a>
+<FONT color="green">004</FONT>    import java.util.Collections;<a name="line.4"></a>
+<FONT color="green">005</FONT>    <a name="line.5"></a>
+<FONT color="green">006</FONT>    public class Tester {<a name="line.6"></a>
+<FONT color="green">007</FONT>    <a name="line.7"></a>
+<FONT color="green">008</FONT>        private static final String KEY = "a26a08df69b43de776d8";<a name="line.8"></a>
+<FONT color="green">009</FONT>        private static final String SECRET = "7122c554d686b72ba6e7";<a name="line.9"></a>
+<FONT color="green">010</FONT>        private static final String APP_ID = "58322";<a name="line.10"></a>
+<FONT color="green">011</FONT>    <a name="line.11"></a>
+<FONT color="green">012</FONT>        public static void main(String[] argv) throws InterruptedException {<a name="line.12"></a>
+<FONT color="green">013</FONT>            Pusher p = new Pusher(APP_ID, KEY, SECRET);<a name="line.13"></a>
+<FONT color="green">014</FONT>    <a name="line.14"></a>
+<FONT color="green">015</FONT>            p.trigger("my-channel", "single-channel-test-event", Collections.singletonMap("name", "value"));<a name="line.15"></a>
+<FONT color="green">016</FONT>            p.trigger(Arrays.asList(new String[] { "my-channel", "my-second-channel" }), "multi-channel-test-event", Collections.singletonMap("name", "value"));<a name="line.16"></a>
+<FONT color="green">017</FONT>    <a name="line.17"></a>
+<FONT color="green">018</FONT>            System.out.println(p.get("/channels").getMessage());<a name="line.18"></a>
+<FONT color="green">019</FONT>        }<a name="line.19"></a>
+<FONT color="green">020</FONT>    }<a name="line.20"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

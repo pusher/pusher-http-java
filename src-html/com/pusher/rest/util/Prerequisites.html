@@ -16,32 +16,37 @@
 <FONT color="green">013</FONT>            if (ref == null) throw new IllegalArgumentException("Parameter [" + name + "] must not be null");<a name="line.13"></a>
 <FONT color="green">014</FONT>        }<a name="line.14"></a>
 <FONT color="green">015</FONT>    <a name="line.15"></a>
-<FONT color="green">016</FONT>        public static void maxLength(final String name, final int max, final List&lt;?&gt; ref) {<a name="line.16"></a>
-<FONT color="green">017</FONT>            if (ref.size() &gt; max) throw new IllegalArgumentException("Parameter [" + name + "] must have size &lt; " + max);<a name="line.17"></a>
-<FONT color="green">018</FONT>        }<a name="line.18"></a>
-<FONT color="green">019</FONT>    <a name="line.19"></a>
-<FONT color="green">020</FONT>        public static void noNullMembers(final String name, final List&lt;?&gt; ref) {<a name="line.20"></a>
-<FONT color="green">021</FONT>            for (Object e : ref) {<a name="line.21"></a>
-<FONT color="green">022</FONT>                if (e == null) throw new IllegalArgumentException("Parameter [" + name + "] must not contain null elements");<a name="line.22"></a>
-<FONT color="green">023</FONT>            }<a name="line.23"></a>
-<FONT color="green">024</FONT>        }<a name="line.24"></a>
-<FONT color="green">025</FONT>    <a name="line.25"></a>
-<FONT color="green">026</FONT>        public static void isValidSha256Key(final String name, final String key) {<a name="line.26"></a>
-<FONT color="green">027</FONT>            try {<a name="line.27"></a>
-<FONT color="green">028</FONT>                Mac mac = Mac.getInstance("HmacSHA256");<a name="line.28"></a>
-<FONT color="green">029</FONT>                mac.init(new SecretKeySpec(key.getBytes(), "SHA256"));<a name="line.29"></a>
-<FONT color="green">030</FONT>                // If that goes OK, then we're good to go<a name="line.30"></a>
-<FONT color="green">031</FONT>            }<a name="line.31"></a>
-<FONT color="green">032</FONT>            catch (final NoSuchAlgorithmException e) {<a name="line.32"></a>
-<FONT color="green">033</FONT>                // Out of luck.<a name="line.33"></a>
-<FONT color="green">034</FONT>                throw new RuntimeException("The Pusher REST client requires HmacSHA256 support", e);<a name="line.34"></a>
-<FONT color="green">035</FONT>            }<a name="line.35"></a>
-<FONT color="green">036</FONT>            catch (final InvalidKeyException e) {<a name="line.36"></a>
-<FONT color="green">037</FONT>                // Failed the test<a name="line.37"></a>
-<FONT color="green">038</FONT>                throw new IllegalArgumentException("Parameter [" + name + "] must be a valid SHA256 key", e);<a name="line.38"></a>
-<FONT color="green">039</FONT>            }<a name="line.39"></a>
-<FONT color="green">040</FONT>        }<a name="line.40"></a>
-<FONT color="green">041</FONT>    }<a name="line.41"></a>
+<FONT color="green">016</FONT>        public static void nonEmpty(final String name, final String ref) {<a name="line.16"></a>
+<FONT color="green">017</FONT>            nonNull(name, ref);<a name="line.17"></a>
+<FONT color="green">018</FONT>            if (ref.length() == 0) throw new IllegalArgumentException("Parameter [" + name + "] must not be empty");<a name="line.18"></a>
+<FONT color="green">019</FONT>        }<a name="line.19"></a>
+<FONT color="green">020</FONT>    <a name="line.20"></a>
+<FONT color="green">021</FONT>        public static void maxLength(final String name, final int max, final List&lt;?&gt; ref) {<a name="line.21"></a>
+<FONT color="green">022</FONT>            if (ref.size() &gt; max) throw new IllegalArgumentException("Parameter [" + name + "] must have size &lt; " + max);<a name="line.22"></a>
+<FONT color="green">023</FONT>        }<a name="line.23"></a>
+<FONT color="green">024</FONT>    <a name="line.24"></a>
+<FONT color="green">025</FONT>        public static void noNullMembers(final String name, final List&lt;?&gt; ref) {<a name="line.25"></a>
+<FONT color="green">026</FONT>            for (Object e : ref) {<a name="line.26"></a>
+<FONT color="green">027</FONT>                if (e == null) throw new IllegalArgumentException("Parameter [" + name + "] must not contain null elements");<a name="line.27"></a>
+<FONT color="green">028</FONT>            }<a name="line.28"></a>
+<FONT color="green">029</FONT>        }<a name="line.29"></a>
+<FONT color="green">030</FONT>    <a name="line.30"></a>
+<FONT color="green">031</FONT>        public static void isValidSha256Key(final String name, final String key) {<a name="line.31"></a>
+<FONT color="green">032</FONT>            try {<a name="line.32"></a>
+<FONT color="green">033</FONT>                Mac mac = Mac.getInstance("HmacSHA256");<a name="line.33"></a>
+<FONT color="green">034</FONT>                mac.init(new SecretKeySpec(key.getBytes(), "SHA256"));<a name="line.34"></a>
+<FONT color="green">035</FONT>                // If that goes OK, then we're good to go<a name="line.35"></a>
+<FONT color="green">036</FONT>            }<a name="line.36"></a>
+<FONT color="green">037</FONT>            catch (final NoSuchAlgorithmException e) {<a name="line.37"></a>
+<FONT color="green">038</FONT>                // Out of luck.<a name="line.38"></a>
+<FONT color="green">039</FONT>                throw new RuntimeException("The Pusher REST client requires HmacSHA256 support", e);<a name="line.39"></a>
+<FONT color="green">040</FONT>            }<a name="line.40"></a>
+<FONT color="green">041</FONT>            catch (final InvalidKeyException e) {<a name="line.41"></a>
+<FONT color="green">042</FONT>                // Failed the test<a name="line.42"></a>
+<FONT color="green">043</FONT>                throw new IllegalArgumentException("Parameter [" + name + "] must be a valid SHA256 key", e);<a name="line.43"></a>
+<FONT color="green">044</FONT>            }<a name="line.44"></a>
+<FONT color="green">045</FONT>        }<a name="line.45"></a>
+<FONT color="green">046</FONT>    }<a name="line.46"></a>
 
 
 
