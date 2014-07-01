@@ -346,10 +346,20 @@ public class Pusher {
         }
     }
 
+    /**
+     * If you wanted to send the REST API requests manually (e.g. using a different HTTP client), this method
+     * will return a java.net.URI which includes all of the appropriate query parameters which sign the request.
+     */
     public URI signedUri(final String method, final String path, final String body) {
         return signedUri(method, path, body, Collections.<String, String>emptyMap());
     }
 
+    /**
+     * If you wanted to send the REST API requests manually (e.g. using a different HTTP client), this method
+     * will return a java.net.URI which includes all of the appropriate query parameters which sign the request.
+     * <p>
+     * Note that any further query parameters you wish to be add must be specified here, as they form part of the signature.
+     */
     public URI signedUri(final String method, final String path, final String body, final Map<String, String> parameters) {
         return SignatureUtil.uri(method, scheme, host, path, body, key, secret, parameters);
     }
