@@ -4,15 +4,57 @@
 
   <groupId>com.pusher</groupId>
   <artifactId>pusher-rest-java</artifactId>
+  <name>Pusher REST Client</name>
   <version>0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
-
-  <name>pusher-rest-java</name>
   <url>http://github.com/pusher/pusher-rest-java</url>
+
+  <description>
+    This is a Java library for interacting with Pusher.com's REST API
+  </description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+
+  <scm>
+    <url>scm:git:git@github.com:pusher/pusher-rest-java</url>
+    <connection>scm:git:git@github.com:pusher/pusher-rest-java</connection>
+    <developerConnection>scm:git:git@github.com:pusher/pusher-rest-java</developerConnection>
+  </scm>
+
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>https://raw.github.com/pusher/pusher-rest-java/master/LICENCE.txt</url>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>Pusher</name>
+    <url>http://pusher.com</url>
+  </organization>
+
+  <issueManagement>
+    <system>Github</system>
+    <url>https://github.com/pusher/pusher-java-client/issues</url>
+  </issueManagement>
+
+  <developers>
+      <developer>
+          <id>mike</id>
+          <name>Mike Pye</name>
+          <email>mike@pusher.com</email>
+          <organization>Pusher</organization>
+          <organizationUrl>http://pusher.com</organizationUrl>
+          <roles>
+              <role>maintainer</role>
+              <role>developer</role>
+          </roles>
+          <timezone>Europe/London</timezone>
+      </developer>
+  </developers>
+
+  <packaging>jar</packaging>
 
   <build>
     <plugins>
