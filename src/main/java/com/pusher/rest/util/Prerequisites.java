@@ -13,6 +13,11 @@ public final class Prerequisites {
         if (ref == null) throw new IllegalArgumentException("Parameter [" + name + "] must not be null");
     }
 
+    public static void nonEmpty(final String name, final String ref) {
+        nonNull(name, ref);
+        if (ref.length() == 0) throw new IllegalArgumentException("Parameter [" + name + "] must not be empty");
+    }
+
     public static void maxLength(final String name, final int max, final List<?> ref) {
         if (ref.size() > max) throw new IllegalArgumentException("Parameter [" + name + "] must have size < " + max);
     }

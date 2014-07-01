@@ -6,6 +6,8 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
@@ -35,6 +37,8 @@ public class Pusher {
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
 
+    private static final Pattern HEROKU_URL = Pattern.compile("(https?)://(.+):(.+)@(.+:?.*)/apps/(.+)");
+
     private final String appId;
     private final String key;
     private final String secret;
@@ -56,17 +60,39 @@ public class Pusher {
      * @param secret The App Secret. Used to sign requests to the API, this should be treated as sensitive and not distributed.
      */
     public Pusher(final String appId, final String key, final String secret) {
-        Prerequisites.nonNull("appId", appId);
-        Prerequisites.nonNull("key", key);
-        Prerequisites.nonNull("secret", secret);
+        Prerequisites.nonEmpty("appId", appId);
+        Prerequisites.nonEmpty("key", key);
+        Prerequisites.nonEmpty("secret", secret);
         Prerequisites.isValidSha256Key("secret", secret);
 
         this.appId = appId;
         this.key = key;
         this.secret = secret;
 
-        this.configureHttpClient(defaultHttpClientBuilder());
+        configure();
+    }
 
+    public Pusher(final String url) {
+        Prerequisites.nonNull("url", url);
+
+        final Matcher m = HEROKU_URL.matcher(url);
+        if (m.matches()) {
+            this.scheme = m.group(1);
+            this.key = m.group(2);
+            this.secret = m.group(3);
+            this.host = m.group(4);
+            this.appId = m.group(5);
+        }
+        else {
+            throw new IllegalArgumentException("URL [" + url + "] does not match pattern [<scheme>://<key>:<secret>@<host>:<port>/apps/<appId>]");
+        }
+
+        Prerequisites.isValidSha256Key("secret", secret);
+        configure();
+    }
+
+    private void configure() {
+        configureHttpClient(defaultHttpClientBuilder());
         this.dataMarshaller = new Gson();
     }
 
