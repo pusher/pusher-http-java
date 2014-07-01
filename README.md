@@ -4,7 +4,15 @@ In order to use this library, you need to have an account on <http://pusher.com>
 
 ## Installation
 
-TODO: Maven snippet
+The pusher-rest-java library is available in Maven Central:
+
+```
+<dependency>
+  <groupId>com.pusher</groupId>
+  <artifactId>pusher-rest-java</artifactId>
+  <version>0.0.1</version>
+</dependency>
+```
 
 ## JavaDoc
 

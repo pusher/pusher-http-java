@@ -2,6 +2,12 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+
   <groupId>com.pusher</groupId>
   <artifactId>pusher-rest-java</artifactId>
   <name>Pusher REST Client</name>
@@ -14,6 +20,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- github server corresponds to entry in ~/.m2/settings.xml -->
+    <github.global.server>github</github.global.server>
   </properties>
 
   <scm>
@@ -57,6 +65,22 @@
   <packaging>jar</packaging>
 
   <build>
+    <finalName>${project.artifactId}-${project.version}</finalName>
+    <outputDirectory>target/classes</outputDirectory>
+    <testOutputDirectory>target/test-classes</testOutputDirectory>
+    <directory>target</directory>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
+
     <plugins>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -86,6 +110,36 @@
       </plugin>
 
       <plugin>
+        <groupId>com.github.github</groupId>
+        <artifactId>site-maven-plugin</artifactId>
+        <version>0.8</version>
+        <configuration>
+          <server>github</server>
+          <repositoryName>pusher-rest-java</repositoryName> <!-- github repo name -->
+          <repositoryOwner>pusher</repositoryOwner> <!-- github username -->
+          <noJekyll>true</noJekyll> <!-- disable webpage processing -->
+        </configuration>
+        <executions>
+          <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
+          <execution>
+            <id>javadoc</id>
+            <configuration>
+              <message>JavaDoc gh-pages for ${project.version}</message><!-- git commit message -->
+              <outputDirectory>${project.build.directory}/apidocs</outputDirectory> <!-- matches distribution management repository url above -->
+              <branch>refs/heads/gh-pages</branch> <!-- remote branch name -->
+              <includes>
+                <include>**/*</include>
+              </includes>
+            </configuration>
+            <goals>
+              <goal>site</goal>
+            </goals>
+            <phase>deploy</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
         <version>2.2.1</version>
@@ -98,6 +152,22 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.4</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 
