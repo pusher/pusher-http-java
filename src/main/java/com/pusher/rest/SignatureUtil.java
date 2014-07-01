@@ -17,6 +17,8 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.client.utils.URIBuilder;
 
+import com.pusher.rest.util.Prerequisites;
+
 public class SignatureUtil {
 
     public static URI uri(final String method,
@@ -27,6 +29,9 @@ public class SignatureUtil {
                           final String key,
                           final String secret,
                           final Map<String, String> extraParams) {
+
+        Prerequisites.noReservedKeys(extraParams);
+
         try {
             final Map<String, String> allParams = new HashMap<String, String>(extraParams);
             allParams.put("auth_key", key);

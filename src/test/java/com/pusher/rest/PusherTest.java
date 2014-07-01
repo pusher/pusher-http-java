@@ -160,4 +160,9 @@ public class PusherTest {
 
         p.get("/channels");
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void reservedParameter() {
+        p.get("/channels", Collections.singletonMap("auth_timestamp", "anything"));
+    }
 }
