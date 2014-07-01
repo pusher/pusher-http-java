@@ -84,7 +84,7 @@ public class Pusher {
             this.appId = m.group(5);
         }
         else {
-            throw new IllegalArgumentException("URL [" + url + "] does not match pattern [<scheme>://<key>:<secret>@<host>:<port>/apps/<appId>]");
+            throw new IllegalArgumentException("URL '" + url + "' does not match pattern '<scheme>://<key>:<secret>@<host>[:<port>]/apps/<appId>'");
         }
 
         Prerequisites.isValidSha256Key("secret", secret);
