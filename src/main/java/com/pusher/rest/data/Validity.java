@@ -1,4 +1,4 @@
-package com.pusher.rest;
+package com.pusher.rest.data;
 
 public enum Validity {
     VALID,
