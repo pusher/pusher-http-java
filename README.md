@@ -6,6 +6,10 @@ In order to use this library, you need to have an account on <http://pusher.com>
 
 TODO: Maven snippet
 
+## JavaDoc
+
+TODO: Where will these be published?
+
 ## Configuration
 
 The minimum configureation required to use the `Pusher` object are the three constructor arguments which identify your Pusher app. You can find them by going to "API Keys" on your app at <https://app.pusher.com>.
@@ -42,6 +46,22 @@ pusher.setRequestTimeout(10000);
 
 HTTPS can be used as transport by calling `setSecure(true)`. Note that your credentials are not exposed on an insecure connection, however the contents of your messages are. Use this option if your messages themselves are sensitive.
 
+#### Advanced HTTP configuration
+
+The library uses Apache HTTP Client (4 series) internally to make HTTP requests. In order to expose some of the rich and fine configuration available in this component, it is partially exposed. The HttpClient uses the Builder pattern to specify configuration. The Pusher library exposes a method to fetch an `HttpClientBuilder` with sensible defaults, and a method to set the client instance in use to one created by a particular builder. By using these two methods, you can further configure the client, overriding defaults or adding new settings.
+
+For example:
+
+##### HTTP Proxy
+
+To set a proxy:
+
+```java
+HttpClientBuilder builder = Pusher.defaultHttpClientBuilder();
+builder.setProxy(new HttpHost("proxy.example.com"));
+pusher.configureHttpClient(builder);
+```
+
 ## Usage
 
 ### General info on responses
@@ -52,7 +72,7 @@ Requests return a member of the `Result` class. Results have a `getStatus` metho
 
 To send an event to one or more channels use the `trigger` method.
 
-The data parameter is serialised using the GSON library (<https://code.google.com/p/google-gson/>). POJO data structures or `java.util.Map`s are suitable.
+The data parameter is serialised using the GSON library (<https://code.google.com/p/google-gson/>). POJO classes or `java.util.Map`s are suitable.
 
 #### Single channel
 
@@ -72,7 +92,7 @@ pusher.trigger(channels, "test_event", Collections.singletonMap("message", "hell
 
 You can trigger an event to at most 10 channels at once. Passing more than 10 channels will cause an exception to be thrown.
 
-### Excluding event recipients
+#### Excluding event recipients
 
 In order to avoid the client that triggered the event from also receiving it, the `trigger` function takes an optional `socketId` parameter. For more information see: <http://pusher.com/docs/publisher_api_guide/publisher_excluding_recipients>.
 
@@ -111,20 +131,13 @@ It's possible to query the state of the application using the `get` method.
 
 The `path` parameter identifies the resource that the request should be made to and the `parameters` parameter should be a map of additional query string key and value pairs.
 
-Params can't include following keys:
-- auth_key
-- auth_timestamp
-- auth_version
-- auth_signature
-- body_md5
-
 For example:
 
 #### Get the list of channels in an application
 
 ```java
 Result result = pusher.get("/channels", params);
-if (result.getStatus == Status.SUCCESS) {
+if (result.getStatus() == Status.SUCCESS) {
     String channelListJson = result.getMessage();
     // Parse and act upon list
 }
@@ -185,6 +198,22 @@ Query parameters can't contain following keys, as they are used to sign the requ
 - auth_version
 - auth_signature
 - body_md5
+
+### Multi-threaded usage
+
+The library is threadsafe and intended for use from many threads simultaneously. By default, HTTP connections are persistent and a pool of open connections is maintained. This re-use reduces the overhead involved in repeated TCP connection establishments and teardowns.
+
+IO calls are blocking, and if more threads make requests at one time than the configured maximum pool size, they will wait for a conneciton to become idle. By default there are at most 2 concurrent connections maintained. This should be enough to many use cases, but it can be configured:
+
+```java
+PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager();
+connManager.setDefaultMaxPerRoute(maxConns);
+
+pusher.configureHttpClient(
+    Pusher.defaultHttpClientBuilder()
+          .setConnectionManager(connManager)
+);
+```
 
 ## License
 

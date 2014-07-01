@@ -357,8 +357,9 @@ public class Pusher {
      * The return value is the complete body which should be returned to a client requesting authorisation.
      */
     public String authenticate(final String channel, final String socketId, final PresenceUser user) {
-        Prerequisites.nonNull("user", user);
+        Prerequisites.nonNull("socketId", socketId);
         Prerequisites.nonNull("channel", channel);
+        Prerequisites.nonNull("user", user);
 
         if (channel.startsWith("private-")) {
             throw new IllegalArgumentException("This method is for presence channels, use authenticate(String, String) to authenticate for a private channel.");
