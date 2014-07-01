@@ -16,15 +16,25 @@ The pusher-rest-java library is available in Maven Central:
 
 ## JavaDoc
 
-TODO: Where will these be published?
+JavaDocs for the latest version are published at <http://pusher.github.io/pusher-rest-java/>
 
 ## Configuration
 
-The minimum configureation required to use the `Pusher` object are the three constructor arguments which identify your Pusher app. You can find them by going to "API Keys" on your app at <https://app.pusher.com>.
+The minimum configuration required to use the `Pusher` object are the three constructor arguments which identify your Pusher app. You can find them by going to "API Keys" on your app at <https://app.pusher.com>.
 
 ```java
 Pusher pusher = new Pusher(appId, apiKey, apiSecret);
 ```
+
+### From URL
+
+The basic parameters may also be set from a URL, as provided (for example) as an environment variable when running on Heroku with the Pusher addon:
+
+```java
+Pusher pusher = new Pusher("http://<key>:<secret>@api.pusherapp.com:80/apps/<appId>");
+```
+
+This form sets the `key`, `secret`, `appId`, `host` and `secure` (based on the protocol in the URL) parameters all at once.
 
 ### Additional options
 
