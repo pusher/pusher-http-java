@@ -430,7 +430,7 @@ public class Pusher {
     }
 
     /**
-     * Generate authentication response to authorise a user on a private channel
+     * Generate authentication response to authorise a user on a presence channel
      * <p>
      * The return value is the complete body which should be returned to a client requesting authorisation.
      */
