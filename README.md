@@ -10,13 +10,13 @@ The pusher-rest-java library is available in Maven Central:
 <dependency>
   <groupId>com.pusher</groupId>
   <artifactId>pusher-rest-java</artifactId>
-  <version>0.0.1</version>
+  <version>0.9.0</version>
 </dependency>
 ```
 
 ## JavaDoc
 
-JavaDocs for the latest version are published at <http://pusher.github.io/pusher-rest-java/>
+Javadocs for the latest version are published at <http://pusher.github.io/pusher-rest-java/>. Javadoc artifacts are also in Maven and should be available for automatic download and attaching by your IDE.
 
 ## Configuration
 
