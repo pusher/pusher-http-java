@@ -5,48 +5,63 @@
 <FONT color="green">002</FONT>    <a name="line.2"></a>
 <FONT color="green">003</FONT>    import java.security.InvalidKeyException;<a name="line.3"></a>
 <FONT color="green">004</FONT>    import java.security.NoSuchAlgorithmException;<a name="line.4"></a>
-<FONT color="green">005</FONT>    import java.util.List;<a name="line.5"></a>
-<FONT color="green">006</FONT>    <a name="line.6"></a>
-<FONT color="green">007</FONT>    import javax.crypto.Mac;<a name="line.7"></a>
-<FONT color="green">008</FONT>    import javax.crypto.spec.SecretKeySpec;<a name="line.8"></a>
-<FONT color="green">009</FONT>    <a name="line.9"></a>
-<FONT color="green">010</FONT>    public final class Prerequisites {<a name="line.10"></a>
-<FONT color="green">011</FONT>    <a name="line.11"></a>
-<FONT color="green">012</FONT>        public static void nonNull(final String name, final Object ref) {<a name="line.12"></a>
-<FONT color="green">013</FONT>            if (ref == null) throw new IllegalArgumentException("Parameter [" + name + "] must not be null");<a name="line.13"></a>
-<FONT color="green">014</FONT>        }<a name="line.14"></a>
+<FONT color="green">005</FONT>    import java.util.Arrays;<a name="line.5"></a>
+<FONT color="green">006</FONT>    import java.util.HashSet;<a name="line.6"></a>
+<FONT color="green">007</FONT>    import java.util.List;<a name="line.7"></a>
+<FONT color="green">008</FONT>    import java.util.Map;<a name="line.8"></a>
+<FONT color="green">009</FONT>    import java.util.Set;<a name="line.9"></a>
+<FONT color="green">010</FONT>    <a name="line.10"></a>
+<FONT color="green">011</FONT>    import javax.crypto.Mac;<a name="line.11"></a>
+<FONT color="green">012</FONT>    import javax.crypto.spec.SecretKeySpec;<a name="line.12"></a>
+<FONT color="green">013</FONT>    <a name="line.13"></a>
+<FONT color="green">014</FONT>    public final class Prerequisites {<a name="line.14"></a>
 <FONT color="green">015</FONT>    <a name="line.15"></a>
-<FONT color="green">016</FONT>        public static void nonEmpty(final String name, final String ref) {<a name="line.16"></a>
-<FONT color="green">017</FONT>            nonNull(name, ref);<a name="line.17"></a>
-<FONT color="green">018</FONT>            if (ref.length() == 0) throw new IllegalArgumentException("Parameter [" + name + "] must not be empty");<a name="line.18"></a>
-<FONT color="green">019</FONT>        }<a name="line.19"></a>
-<FONT color="green">020</FONT>    <a name="line.20"></a>
-<FONT color="green">021</FONT>        public static void maxLength(final String name, final int max, final List&lt;?&gt; ref) {<a name="line.21"></a>
-<FONT color="green">022</FONT>            if (ref.size() &gt; max) throw new IllegalArgumentException("Parameter [" + name + "] must have size &lt; " + max);<a name="line.22"></a>
-<FONT color="green">023</FONT>        }<a name="line.23"></a>
-<FONT color="green">024</FONT>    <a name="line.24"></a>
-<FONT color="green">025</FONT>        public static void noNullMembers(final String name, final List&lt;?&gt; ref) {<a name="line.25"></a>
-<FONT color="green">026</FONT>            for (Object e : ref) {<a name="line.26"></a>
-<FONT color="green">027</FONT>                if (e == null) throw new IllegalArgumentException("Parameter [" + name + "] must not contain null elements");<a name="line.27"></a>
-<FONT color="green">028</FONT>            }<a name="line.28"></a>
-<FONT color="green">029</FONT>        }<a name="line.29"></a>
-<FONT color="green">030</FONT>    <a name="line.30"></a>
-<FONT color="green">031</FONT>        public static void isValidSha256Key(final String name, final String key) {<a name="line.31"></a>
-<FONT color="green">032</FONT>            try {<a name="line.32"></a>
-<FONT color="green">033</FONT>                Mac mac = Mac.getInstance("HmacSHA256");<a name="line.33"></a>
-<FONT color="green">034</FONT>                mac.init(new SecretKeySpec(key.getBytes(), "SHA256"));<a name="line.34"></a>
-<FONT color="green">035</FONT>                // If that goes OK, then we're good to go<a name="line.35"></a>
-<FONT color="green">036</FONT>            }<a name="line.36"></a>
-<FONT color="green">037</FONT>            catch (final NoSuchAlgorithmException e) {<a name="line.37"></a>
-<FONT color="green">038</FONT>                // Out of luck.<a name="line.38"></a>
-<FONT color="green">039</FONT>                throw new RuntimeException("The Pusher REST client requires HmacSHA256 support", e);<a name="line.39"></a>
-<FONT color="green">040</FONT>            }<a name="line.40"></a>
-<FONT color="green">041</FONT>            catch (final InvalidKeyException e) {<a name="line.41"></a>
-<FONT color="green">042</FONT>                // Failed the test<a name="line.42"></a>
-<FONT color="green">043</FONT>                throw new IllegalArgumentException("Parameter [" + name + "] must be a valid SHA256 key", e);<a name="line.43"></a>
-<FONT color="green">044</FONT>            }<a name="line.44"></a>
-<FONT color="green">045</FONT>        }<a name="line.45"></a>
-<FONT color="green">046</FONT>    }<a name="line.46"></a>
+<FONT color="green">016</FONT>        private static final Set&lt;String&gt; RESERVED_QUERY_KEYS = new HashSet&lt;String&gt;(<a name="line.16"></a>
+<FONT color="green">017</FONT>                Arrays.asList(new String[] { "auth_key", "auth_timestamp", "auth_version", "auth_signature", "body_md5" }));<a name="line.17"></a>
+<FONT color="green">018</FONT>    <a name="line.18"></a>
+<FONT color="green">019</FONT>        public static void nonNull(final String name, final Object ref) {<a name="line.19"></a>
+<FONT color="green">020</FONT>            if (ref == null) throw new IllegalArgumentException("Parameter [" + name + "] must not be null");<a name="line.20"></a>
+<FONT color="green">021</FONT>        }<a name="line.21"></a>
+<FONT color="green">022</FONT>    <a name="line.22"></a>
+<FONT color="green">023</FONT>        public static void nonEmpty(final String name, final String ref) {<a name="line.23"></a>
+<FONT color="green">024</FONT>            nonNull(name, ref);<a name="line.24"></a>
+<FONT color="green">025</FONT>            if (ref.length() == 0) throw new IllegalArgumentException("Parameter [" + name + "] must not be empty");<a name="line.25"></a>
+<FONT color="green">026</FONT>        }<a name="line.26"></a>
+<FONT color="green">027</FONT>    <a name="line.27"></a>
+<FONT color="green">028</FONT>        public static void maxLength(final String name, final int max, final List&lt;?&gt; ref) {<a name="line.28"></a>
+<FONT color="green">029</FONT>            if (ref.size() &gt; max) throw new IllegalArgumentException("Parameter [" + name + "] must have size &lt; " + max);<a name="line.29"></a>
+<FONT color="green">030</FONT>        }<a name="line.30"></a>
+<FONT color="green">031</FONT>    <a name="line.31"></a>
+<FONT color="green">032</FONT>        public static void noNullMembers(final String name, final List&lt;?&gt; ref) {<a name="line.32"></a>
+<FONT color="green">033</FONT>            for (Object e : ref) {<a name="line.33"></a>
+<FONT color="green">034</FONT>                if (e == null) throw new IllegalArgumentException("Parameter [" + name + "] must not contain null elements");<a name="line.34"></a>
+<FONT color="green">035</FONT>            }<a name="line.35"></a>
+<FONT color="green">036</FONT>        }<a name="line.36"></a>
+<FONT color="green">037</FONT>    <a name="line.37"></a>
+<FONT color="green">038</FONT>        public static void noReservedKeys(final Map&lt;String, String&gt; params) {<a name="line.38"></a>
+<FONT color="green">039</FONT>            for (String k : params.keySet()) {<a name="line.39"></a>
+<FONT color="green">040</FONT>                if (RESERVED_QUERY_KEYS.contains(k.toLowerCase())) {<a name="line.40"></a>
+<FONT color="green">041</FONT>                    throw new IllegalArgumentException("Query parameter key [" + k + "] is reserved and should not be submitted. It will be generated by the signature generation.");<a name="line.41"></a>
+<FONT color="green">042</FONT>                }<a name="line.42"></a>
+<FONT color="green">043</FONT>            }<a name="line.43"></a>
+<FONT color="green">044</FONT>        }<a name="line.44"></a>
+<FONT color="green">045</FONT>    <a name="line.45"></a>
+<FONT color="green">046</FONT>        public static void isValidSha256Key(final String name, final String key) {<a name="line.46"></a>
+<FONT color="green">047</FONT>            try {<a name="line.47"></a>
+<FONT color="green">048</FONT>                Mac mac = Mac.getInstance("HmacSHA256");<a name="line.48"></a>
+<FONT color="green">049</FONT>                mac.init(new SecretKeySpec(key.getBytes(), "SHA256"));<a name="line.49"></a>
+<FONT color="green">050</FONT>                // If that goes OK, then we're good to go<a name="line.50"></a>
+<FONT color="green">051</FONT>            }<a name="line.51"></a>
+<FONT color="green">052</FONT>            catch (final NoSuchAlgorithmException e) {<a name="line.52"></a>
+<FONT color="green">053</FONT>                // Out of luck.<a name="line.53"></a>
+<FONT color="green">054</FONT>                throw new RuntimeException("The Pusher REST client requires HmacSHA256 support", e);<a name="line.54"></a>
+<FONT color="green">055</FONT>            }<a name="line.55"></a>
+<FONT color="green">056</FONT>            catch (final InvalidKeyException e) {<a name="line.56"></a>
+<FONT color="green">057</FONT>                // Failed the test<a name="line.57"></a>
+<FONT color="green">058</FONT>                throw new IllegalArgumentException("Parameter [" + name + "] must be a valid SHA256 key", e);<a name="line.58"></a>
+<FONT color="green">059</FONT>            }<a name="line.59"></a>
+<FONT color="green">060</FONT>        }<a name="line.60"></a>
+<FONT color="green">061</FONT>    }<a name="line.61"></a>
 
 
 

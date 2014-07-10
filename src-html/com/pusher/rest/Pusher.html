@@ -417,7 +417,7 @@
 <FONT color="green">414</FONT>         * &lt;p&gt;<a name="line.414"></a>
 <FONT color="green">415</FONT>         * The return value is the complete body which should be returned to a client requesting authorisation.<a name="line.415"></a>
 <FONT color="green">416</FONT>         */<a name="line.416"></a>
-<FONT color="green">417</FONT>        public String authenticate(final String channel, final String socketId) {<a name="line.417"></a>
+<FONT color="green">417</FONT>        public String authenticate(final String socketId, final String channel) {<a name="line.417"></a>
 <FONT color="green">418</FONT>            Prerequisites.nonNull("socketId", socketId);<a name="line.418"></a>
 <FONT color="green">419</FONT>            Prerequisites.nonNull("channel", channel);<a name="line.419"></a>
 <FONT color="green">420</FONT>    <a name="line.420"></a>
@@ -433,11 +433,11 @@
 <FONT color="green">430</FONT>        }<a name="line.430"></a>
 <FONT color="green">431</FONT>    <a name="line.431"></a>
 <FONT color="green">432</FONT>        /**<a name="line.432"></a>
-<FONT color="green">433</FONT>         * Generate authentication response to authorise a user on a private channel<a name="line.433"></a>
+<FONT color="green">433</FONT>         * Generate authentication response to authorise a user on a presence channel<a name="line.433"></a>
 <FONT color="green">434</FONT>         * &lt;p&gt;<a name="line.434"></a>
 <FONT color="green">435</FONT>         * The return value is the complete body which should be returned to a client requesting authorisation.<a name="line.435"></a>
 <FONT color="green">436</FONT>         */<a name="line.436"></a>
-<FONT color="green">437</FONT>        public String authenticate(final String channel, final String socketId, final PresenceUser user) {<a name="line.437"></a>
+<FONT color="green">437</FONT>        public String authenticate(final String socketId, final String channel, final PresenceUser user) {<a name="line.437"></a>
 <FONT color="green">438</FONT>            Prerequisites.nonNull("socketId", socketId);<a name="line.438"></a>
 <FONT color="green">439</FONT>            Prerequisites.nonNull("channel", channel);<a name="line.439"></a>
 <FONT color="green">440</FONT>            Prerequisites.nonNull("user", user);<a name="line.440"></a>
