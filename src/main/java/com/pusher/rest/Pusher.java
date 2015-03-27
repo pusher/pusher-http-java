@@ -35,7 +35,7 @@ import com.pusher.rest.util.Prerequisites;
 /**
  * A library for interacting with the Pusher REST API.
  * <p>
- * See http://github.com/pusher/pusher-rest-java for an overview
+ * See http://github.com/pusher/pusher-http-java for an overview
  * <p>
  * Essentially:
  * <pre>

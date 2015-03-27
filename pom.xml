@@ -8,10 +8,10 @@
   </parent>
 
   <groupId>com.pusher</groupId>
-  <artifactId>pusher-rest-java</artifactId>
+  <artifactId>pusher-http-java</artifactId>
   <name>Pusher REST Client</name>
   <version>0.9.1-SNAPSHOT</version>
-  <url>http://github.com/pusher/pusher-rest-java</url>
+  <url>http://github.com/pusher/pusher-http-java</url>
 
   <description>
     This is a Java library for interacting with Pusher.com's REST API
@@ -24,15 +24,15 @@
   </properties>
 
   <scm>
-    <url>scm:git:git@github.com:pusher/pusher-rest-java</url>
-    <connection>scm:git:git@github.com:pusher/pusher-rest-java</connection>
-    <developerConnection>scm:git:git@github.com:pusher/pusher-rest-java</developerConnection>
+    <url>scm:git:git@github.com:pusher/pusher-http-java</url>
+    <connection>scm:git:git@github.com:pusher/pusher-http-java</connection>
+    <developerConnection>scm:git:git@github.com:pusher/pusher-http-java</developerConnection>
   </scm>
 
   <licenses>
     <license>
       <name>MIT</name>
-      <url>https://raw.github.com/pusher/pusher-rest-java/master/LICENCE.txt</url>
+      <url>https://raw.github.com/pusher/pusher-http-java/master/LICENCE.txt</url>
     </license>
   </licenses>
 
@@ -114,7 +114,7 @@
         <version>0.8</version>
         <configuration>
           <server>github</server>
-          <repositoryName>pusher-rest-java</repositoryName> <!-- github repo name -->
+          <repositoryName>pusher-http-java</repositoryName> <!-- github repo name -->
           <repositoryOwner>pusher</repositoryOwner> <!-- github username -->
           <noJekyll>true</noJekyll> <!-- disable webpage processing -->
         </configuration>
