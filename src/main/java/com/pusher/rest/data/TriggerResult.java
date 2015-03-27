@@ -13,16 +13,16 @@ public class TriggerResult {
         }
     }
 
+    private static final Gson GSON = new Gson();
+
     private final Result.Status status;
     private final Integer httpStatus;
     private final String message;
-    private final Gson dataMarshaller;
 
-    public TriggerResult(final Result result, final Gson dataMarshaller) {
+    public TriggerResult(final Result result) {
         this.status = result.getStatus();
         this.httpStatus = result.getHttpStatus();
         this.message = result.getMessage();
-        this.dataMarshaller = dataMarshaller;
     }
 
     /**
@@ -52,7 +52,7 @@ public class TriggerResult {
      * Response might be null.
      */
     public Map<String, String> getEventIDs() {
-        final Data obj = this.dataMarshaller.fromJson(this.message, Data.class);
+        final Data obj = GSON.fromJson(this.message, Data.class);
         return obj.event_ids;
     }
 }
