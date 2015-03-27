@@ -292,7 +292,7 @@ public class Pusher {
      * @param data an object which will be serialised to create the event body
      * @return a {@link Result} object encapsulating the success state and response to the request
      */
-    public Result trigger(final String channel, final String eventName, final Object data) {
+    public TriggerResult trigger(final String channel, final String eventName, final Object data) {
         return trigger(channel, eventName, data, null);
     }
 
@@ -304,7 +304,7 @@ public class Pusher {
      * @param data an object which will be serialised to create the event body
      * @return a {@link Result} object encapsulating the success state and response to the request
      */
-    public Result trigger(final List<String> channels, final String eventName, final Object data) {
+    public TriggerResult trigger(final List<String> channels, final String eventName, final Object data) {
         return trigger(channels, eventName, data, null);
     }
 
@@ -317,7 +317,7 @@ public class Pusher {
      * @param socketId a socket id which should be excluded from receiving the event
      * @return a {@link Result} object encapsulating the success state and response to the request
      */
-    public Result trigger(final String channel, final String eventName, final Object data, final String socketId) {
+    public TriggerResult trigger(final String channel, final String eventName, final Object data, final String socketId) {
         return trigger(Collections.singletonList(channel), eventName, data, socketId);
     }
 
@@ -330,7 +330,7 @@ public class Pusher {
      * @param socketId a socket id which should be excluded from receiving the event
      * @return a {@link Result} object encapsulating the success state and response to the request
      */
-    public Result trigger(final List<String> channels, final String eventName, final Object data, final String socketId) {
+    public TriggerResult trigger(final List<String> channels, final String eventName, final Object data, final String socketId) {
         Prerequisites.nonNull("channels", channels);
         Prerequisites.nonNull("eventName", eventName);
         Prerequisites.nonNull("data", data);
@@ -341,7 +341,7 @@ public class Pusher {
 
         final String body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
 
-        return post("/events", body);
+        return new TriggerResult(post("/events", body), dataMarshaller);
     }
 
     /**
