@@ -1,5 +1,8 @@
 # Pusher Java REST library
 
+[![Build
+Status](https://travis-ci.org/pusher/pusher-http-java.svg?branch=master)](https://travis-ci.org/pusher/pusher-http-java)
+
 In order to use this library, you need to have an account on <http://pusher.com>. After registering, you will need the application credentials for your app.
 
 ## Installation
