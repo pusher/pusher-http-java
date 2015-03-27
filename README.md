@@ -12,7 +12,7 @@ The pusher-http-java library is available in Maven Central:
 ```
 <dependency>
   <groupId>com.pusher</groupId>
-  <artifactId>pusher-http-java</artifactId>
+  <artifactId>pusher-rest-java</artifactId>
   <version>0.9.0</version>
 </dependency>
 ```
