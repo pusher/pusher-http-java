@@ -1,13 +1,8 @@
 package com.pusher.rest.data;
 
-import java.lang.reflect.Type;
 import java.util.Map;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import com.pusher.rest.data.Result;
-import static com.pusher.rest.data.Result.Status;
 
 public class TriggerResult {
     static class Data {
@@ -53,7 +48,7 @@ public class TriggerResult {
 
     /**
      * Get the map from channel name to event ID.
-     * 
+     *
      * Response might be null.
      */
     public Map<String, String> getEventIDs() {
