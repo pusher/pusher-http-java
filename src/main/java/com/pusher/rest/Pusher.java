@@ -29,6 +29,7 @@ import com.pusher.rest.data.AuthData;
 import com.pusher.rest.data.PresenceUser;
 import com.pusher.rest.data.Result;
 import com.pusher.rest.data.TriggerData;
+import com.pusher.rest.data.TriggerResult;
 import com.pusher.rest.data.Validity;
 import com.pusher.rest.util.Prerequisites;
 
