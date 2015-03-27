@@ -52,7 +52,7 @@ public class TriggerResult {
      * Response might be null.
      */
     public Map<String, String> getEventIDs() {
-        Data obj = this.dataMarshaller.fromJson(this.message, Data.class);
+        final Data obj = this.dataMarshaller.fromJson(this.message, Data.class);
         return obj.event_ids;
     }
 }
