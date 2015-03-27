@@ -4,12 +4,12 @@ In order to use this library, you need to have an account on <http://pusher.com>
 
 ## Installation
 
-The pusher-rest-java library is available in Maven Central:
+The pusher-http-java library is available in Maven Central:
 
 ```
 <dependency>
   <groupId>com.pusher</groupId>
-  <artifactId>pusher-rest-java</artifactId>
+  <artifactId>pusher-http-java</artifactId>
   <version>0.9.0</version>
 </dependency>
 ```
