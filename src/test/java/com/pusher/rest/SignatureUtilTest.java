@@ -5,7 +5,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.Test;
@@ -23,11 +23,11 @@ public class SignatureUtilTest {
 
     @Test
     public void stringToSignQueryParamsOrderedByKey() {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new LinkedHashMap<String, String>();
         params.put("a", "v1");
-        params.put("bat", "v2");
-        params.put("car", "v3");
-        params.put("cat", "v4");
+        params.put("zat", "v4");
+        params.put("car", "v2");
+        params.put("cat", "v3");
 
         // Make sure the iteration order is not incidentally alphabetical, or we're not testing what we intend to.
         String[] defaultOrder = params.keySet().toArray(new String[0]);
@@ -36,7 +36,7 @@ public class SignatureUtilTest {
         assertThat(defaultOrder, not(equalTo(sortedOrder)));
 
         String toSign = SignatureUtil.buildSignatureString("POST", "/", params);
-        assertThat(toSign, containsString("a=v1&bat=v2&car=v3&cat=v4"));
+        assertThat(toSign, containsString("a=v1&car=v2&cat=v3&zat=v4"));
     }
 
 }
