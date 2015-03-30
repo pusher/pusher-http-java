@@ -1,8 +1,11 @@
 package com.pusher.rest.data;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
+
+import com.pusher.rest.data.Result.Status;
 
 public class TriggerResult {
     static class Data {
@@ -52,7 +55,16 @@ public class TriggerResult {
      * Response might be null.
      */
     public Map<String, String> getEventIDs() {
+        if (this.status != Status.SUCCESS) {
+            return new HashMap<String, String>();
+        }
+
         final Data obj = GSON.fromJson(this.message, Data.class);
+
+        if (obj.event_ids == null) {
+            return new HashMap<String, String>();
+        }
+        
         return obj.event_ids;
     }
 }
