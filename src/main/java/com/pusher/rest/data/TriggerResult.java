@@ -1,6 +1,5 @@
 package com.pusher.rest.data;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -56,19 +55,16 @@ public class TriggerResult {
     /**
      * Get the map from channel name to event ID.
      *
-     * Response might be null.
+     * If the response statud != SUCCESS or when talking to old APIS, the
+     * return value will be null.
      */
     public Map<String, String> getEventIDs() {
         if (this.status != Status.SUCCESS) {
-            return new HashMap<String, String>();
+            return null;
         }
 
         final Data obj = GSON.fromJson(this.message, Data.class);
 
-        if (obj.eventIds == null) {
-            return new HashMap<String, String>();
-        }
-        
         return obj.eventIds;
     }
 }

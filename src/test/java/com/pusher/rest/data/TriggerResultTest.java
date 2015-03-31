@@ -1,6 +1,7 @@
 package com.pusher.rest;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import java.util.Collections;
@@ -13,9 +14,9 @@ import com.pusher.rest.data.TriggerResult;
 public class TriggerResultTest {
 
     @Test
-    public void returnsAnEmptyMapForOldAPI() {
+    public void returnsNullForOldAPI() {
         TriggerResult tr = build(200, "{}");
-        assertThat(tr.getEventIDs().isEmpty(), is(true));
+        assertNull(tr.getEventIDs());
     }
 
     @Test
@@ -26,9 +27,9 @@ public class TriggerResultTest {
     }
 
     @Test
-    public void returnsAnEmptyMapForError() {
+    public void returnsNullForError() {
         TriggerResult tr = build(500, "{\"event_ids\":{\"channel1\":\"eventid1\"}}");
-        assertThat(tr.getEventIDs().isEmpty(), is(true));
+        assertNull(tr.getEventIDs());
     }
 
     private TriggerResult build(final int status, final String body) {
