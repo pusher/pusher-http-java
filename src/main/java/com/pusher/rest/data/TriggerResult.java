@@ -19,7 +19,7 @@ public class TriggerResult extends Result {
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
 
-    protected TriggerResult(Status status, Integer httpStatus, String message) {
+    protected TriggerResult(final Status status, final Integer httpStatus, final String message) {
         super(status, httpStatus, message);
     }
 
