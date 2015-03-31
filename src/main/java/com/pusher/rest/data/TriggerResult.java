@@ -42,8 +42,8 @@ public class TriggerResult extends Result {
             return null;
         }
 
-        final Data obj = GSON.fromJson(this.getMessage(), Data.class);
-
-        return obj.eventIds;
+        return GSON
+            .fromJson(this.getMessage(), Data.class)
+            .eventIds;
     }
 }
