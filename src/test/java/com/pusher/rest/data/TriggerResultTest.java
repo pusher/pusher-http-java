@@ -34,7 +34,7 @@ public class TriggerResultTest {
 
     private TriggerResult build(final int status, final String body) {
         Result result = Result.fromHttpCode(status, body);
-        return new TriggerResult(result);
+        return TriggerResult.fromResult(result);
     }
 
 }

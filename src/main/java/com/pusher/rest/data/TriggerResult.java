@@ -6,9 +6,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.FieldNamingPolicy;
 
+import com.pusher.rest.data.Result;
 import com.pusher.rest.data.Result.Status;
 
-public class TriggerResult {
+public class TriggerResult extends Result {
     static class Data {
         public final Map<String, String> eventIds;
 
@@ -18,38 +19,19 @@ public class TriggerResult {
     }
 
     private static final Gson GSON = new GsonBuilder()
-        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-        .create();
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .create();
 
-    private final Result.Status status;
-    private final Integer httpStatus;
-    private final String message;
-
-    public TriggerResult(final Result result) {
-        this.status = result.getStatus();
-        this.httpStatus = result.getHttpStatus();
-        this.message = result.getMessage();
+    protected TriggerResult(Status status, Integer httpStatus, String message) {
+        super(status, httpStatus, message);
     }
 
-    /**
-     * Get the enum classifying the result of the call
-     */
-    public Result.Status getStatus() {
-        return status;
-    }
-
-    /**
-     * Get the HTTP status code of the call, useful for debugging instances of UNKNOWN_ERROR
-     */
-    public Integer getHttpStatus() {
-        return httpStatus;
-    }
-
-    /**
-     * Get the data response (success) or descriptive message (error) returned from the call
-     */
-    public String getMessage() {
-        return message;
+    public static TriggerResult fromResult(final Result result) {
+        return new TriggerResult(
+            result.getStatus(),
+            result.getHttpStatus(),
+            result.getMessage()
+        );
     }
 
     /**
