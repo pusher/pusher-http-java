@@ -6,9 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.FieldNamingPolicy;
 
-import com.pusher.rest.data.Result;
-import com.pusher.rest.data.Result.Status;
-
 public class TriggerResult extends Result {
     static class Data {
         public final Map<String, String> eventIds;
