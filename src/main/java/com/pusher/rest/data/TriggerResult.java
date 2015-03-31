@@ -38,11 +38,11 @@ public class TriggerResult extends Result {
      * return value will be null.
      */
     public Map<String, String> getEventIDs() {
-        if (this.status != Status.SUCCESS) {
+        if (this.getStatus() != Status.SUCCESS) {
             return null;
         }
 
-        final Data obj = GSON.fromJson(this.message, Data.class);
+        final Data obj = GSON.fromJson(this.getMessage(), Data.class);
 
         return obj.eventIds;
     }

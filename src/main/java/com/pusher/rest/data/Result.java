@@ -32,9 +32,9 @@ public class Result {
         }
     }
 
-    protected final Status status;
-    protected final Integer httpStatus;
-    protected final String message;
+    private final Status status;
+    private final Integer httpStatus;
+    private final String message;
 
     protected Result(final Status status, final Integer httpStatus, final String message) {
         this.status = status;
