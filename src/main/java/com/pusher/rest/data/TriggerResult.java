@@ -4,19 +4,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.FieldNamingPolicy;
 
 import com.pusher.rest.data.Result.Status;
 
 public class TriggerResult {
     static class Data {
-        public final Map<String, String> event_ids;
+        public final Map<String, String> eventIds;
 
-        public Data(final Map<String, String> event_ids) {
-            this.event_ids = event_ids;
+        public Data(final Map<String, String> eventIds) {
+            this.eventIds = eventIds;
         }
     }
 
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder()
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .create();
 
     private final Result.Status status;
     private final Integer httpStatus;
@@ -61,10 +65,10 @@ public class TriggerResult {
 
         final Data obj = GSON.fromJson(this.message, Data.class);
 
-        if (obj.event_ids == null) {
+        if (obj.eventIds == null) {
             return new HashMap<String, String>();
         }
         
-        return obj.event_ids;
+        return obj.eventIds;
     }
 }
