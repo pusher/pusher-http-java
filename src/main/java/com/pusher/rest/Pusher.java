@@ -21,9 +21,7 @@ import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
-import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import com.pusher.rest.data.AuthData;
 import com.pusher.rest.data.PresenceUser;
@@ -31,6 +29,7 @@ import com.pusher.rest.data.Result;
 import com.pusher.rest.data.TriggerData;
 import com.pusher.rest.data.TriggerResult;
 import com.pusher.rest.data.Validity;
+import com.pusher.rest.util.Marshal;
 import com.pusher.rest.util.Prerequisites;
 
 /**
@@ -62,10 +61,6 @@ import com.pusher.rest.util.Prerequisites;
  * </pre>
  */
 public class Pusher {
-    private static final Gson BODY_SERIALISER = new GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-            .create();
-
     private static final Pattern HEROKU_URL = Pattern.compile("(https?)://(.+):(.+)@(.+:?.*)/apps/(.+)");
 
     private final String appId;
@@ -340,7 +335,7 @@ public class Pusher {
         Prerequisites.areValidChannels(channels);
         Prerequisites.isValidSocketId(socketId);
 
-        final String body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
+        final String body = Marshal.GSON.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
 
         return TriggerResult.fromResult(post("/events", body));
     }
@@ -490,7 +485,7 @@ public class Pusher {
         }
 
         final String signature = SignatureUtil.sign(socketId + ":" + channel, secret);
-        return BODY_SERIALISER.toJson(new AuthData(key, signature));
+        return Marshal.GSON.toJson(new AuthData(key, signature));
     }
 
     /**
@@ -517,9 +512,9 @@ public class Pusher {
             throw new IllegalArgumentException("Authentication is only applicable to private and presence channels");
         }
 
-        final String channelData = BODY_SERIALISER.toJson(user);
+        final String channelData = Marshal.GSON.toJson(user);
         final String signature = SignatureUtil.sign(socketId + ":" + channel + ":" + channelData, secret);
-        return BODY_SERIALISER.toJson(new AuthData(key, signature, channelData));
+        return Marshal.GSON.toJson(new AuthData(key, signature, channelData));
     }
 
     /*

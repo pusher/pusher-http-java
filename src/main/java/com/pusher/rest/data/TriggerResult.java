@@ -2,9 +2,7 @@ package com.pusher.rest.data;
 
 import java.util.Map;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.FieldNamingPolicy;
+import com.pusher.rest.util.Marshal;
 
 public class TriggerResult extends Result {
     static class Data {
@@ -14,10 +12,6 @@ public class TriggerResult extends Result {
             this.eventIds = eventIds;
         }
     }
-
-    private static final Gson GSON = new GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-            .create();
 
     protected TriggerResult(final Status status, final Integer httpStatus, final String message) {
         super(status, httpStatus, message);
@@ -42,7 +36,7 @@ public class TriggerResult extends Result {
             return null;
         }
 
-        return GSON
+        return Marshal.GSON
             .fromJson(this.getMessage(), Data.class)
             .eventIds;
     }
