@@ -42,7 +42,7 @@ import com.pusher.rest.util.Prerequisites;
  * // Init
  * Pusher pusher = new Pusher(APP_ID, KEY, SECRET);
  * // Publish
- * Result triggerResult = pusher.trigger("my-channel", "my-eventname", myPojoForSerialisation);
+ * TriggerResult triggerResult = pusher.trigger("my-channel", "my-eventname", myPojoForSerialisation);
  * if (triggerResult.getStatus() != Status.SUCCESS) {
  *   if (triggerResult.getStatus().shouldRetry()) {
  *     // Temporary, let's schedule a retry

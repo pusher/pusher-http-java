@@ -28,7 +28,7 @@ public class TriggerResult extends Result {
     /**
      * Get the map from channel name to event ID.
      *
-     * If the response statud != SUCCESS or when talking to old APIS, the
+     * If the response status != SUCCESS or when talking to old APIS, the
      * return value will be null.
      */
     public Map<String, String> getEventIDs() {
