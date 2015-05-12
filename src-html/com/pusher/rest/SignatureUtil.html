@@ -1,129 +1,134 @@
-<HTML>
-<BODY BGCOLOR="white">
-<PRE>
-<FONT color="green">001</FONT>    package com.pusher.rest;<a name="line.1"></a>
-<FONT color="green">002</FONT>    <a name="line.2"></a>
-<FONT color="green">003</FONT>    import java.io.UnsupportedEncodingException;<a name="line.3"></a>
-<FONT color="green">004</FONT>    import java.net.URI;<a name="line.4"></a>
-<FONT color="green">005</FONT>    import java.net.URISyntaxException;<a name="line.5"></a>
-<FONT color="green">006</FONT>    import java.security.InvalidKeyException;<a name="line.6"></a>
-<FONT color="green">007</FONT>    import java.security.MessageDigest;<a name="line.7"></a>
-<FONT color="green">008</FONT>    import java.security.NoSuchAlgorithmException;<a name="line.8"></a>
-<FONT color="green">009</FONT>    import java.util.Arrays;<a name="line.9"></a>
-<FONT color="green">010</FONT>    import java.util.HashMap;<a name="line.10"></a>
-<FONT color="green">011</FONT>    import java.util.Map;<a name="line.11"></a>
-<FONT color="green">012</FONT>    import java.util.Map.Entry;<a name="line.12"></a>
-<FONT color="green">013</FONT>    <a name="line.13"></a>
-<FONT color="green">014</FONT>    import javax.crypto.Mac;<a name="line.14"></a>
-<FONT color="green">015</FONT>    import javax.crypto.spec.SecretKeySpec;<a name="line.15"></a>
-<FONT color="green">016</FONT>    <a name="line.16"></a>
-<FONT color="green">017</FONT>    import org.apache.commons.codec.binary.Hex;<a name="line.17"></a>
-<FONT color="green">018</FONT>    import org.apache.http.client.utils.URIBuilder;<a name="line.18"></a>
-<FONT color="green">019</FONT>    <a name="line.19"></a>
-<FONT color="green">020</FONT>    import com.pusher.rest.util.Prerequisites;<a name="line.20"></a>
-<FONT color="green">021</FONT>    <a name="line.21"></a>
-<FONT color="green">022</FONT>    public class SignatureUtil {<a name="line.22"></a>
-<FONT color="green">023</FONT>    <a name="line.23"></a>
-<FONT color="green">024</FONT>        public static URI uri(final String method,<a name="line.24"></a>
-<FONT color="green">025</FONT>                              final String scheme,<a name="line.25"></a>
-<FONT color="green">026</FONT>                              final String host,<a name="line.26"></a>
-<FONT color="green">027</FONT>                              final String path,<a name="line.27"></a>
-<FONT color="green">028</FONT>                              final String body,<a name="line.28"></a>
-<FONT color="green">029</FONT>                              final String key,<a name="line.29"></a>
-<FONT color="green">030</FONT>                              final String secret,<a name="line.30"></a>
-<FONT color="green">031</FONT>                              final Map&lt;String, String&gt; extraParams) {<a name="line.31"></a>
-<FONT color="green">032</FONT>    <a name="line.32"></a>
-<FONT color="green">033</FONT>            Prerequisites.noReservedKeys(extraParams);<a name="line.33"></a>
-<FONT color="green">034</FONT>    <a name="line.34"></a>
-<FONT color="green">035</FONT>            try {<a name="line.35"></a>
-<FONT color="green">036</FONT>                final Map&lt;String, String&gt; allParams = new HashMap&lt;String, String&gt;(extraParams);<a name="line.36"></a>
-<FONT color="green">037</FONT>                allParams.put("auth_key", key);<a name="line.37"></a>
-<FONT color="green">038</FONT>                allParams.put("auth_version", "1.0");<a name="line.38"></a>
-<FONT color="green">039</FONT>                allParams.put("auth_timestamp", new Long(System.currentTimeMillis() / 1000).toString());<a name="line.39"></a>
-<FONT color="green">040</FONT>                if (body != null) {<a name="line.40"></a>
-<FONT color="green">041</FONT>                    allParams.put("body_md5", bodyMd5(body));<a name="line.41"></a>
-<FONT color="green">042</FONT>                }<a name="line.42"></a>
-<FONT color="green">043</FONT>    <a name="line.43"></a>
-<FONT color="green">044</FONT>                // This is where the auth gets a bit weird. The query params for the request must include<a name="line.44"></a>
-<FONT color="green">045</FONT>                // the auth signature which is a signature over all the params except itself.<a name="line.45"></a>
-<FONT color="green">046</FONT>                allParams.put("auth_signature", sign(buildSignatureString(method, path, allParams), secret));<a name="line.46"></a>
-<FONT color="green">047</FONT>    <a name="line.47"></a>
-<FONT color="green">048</FONT>                final URIBuilder b = new URIBuilder()<a name="line.48"></a>
-<FONT color="green">049</FONT>                        .setScheme(scheme)<a name="line.49"></a>
-<FONT color="green">050</FONT>                        .setHost(host)<a name="line.50"></a>
-<FONT color="green">051</FONT>                        .setPath(path);<a name="line.51"></a>
-<FONT color="green">052</FONT>    <a name="line.52"></a>
-<FONT color="green">053</FONT>                for (final Entry&lt;String, String&gt; e : allParams.entrySet()) {<a name="line.53"></a>
-<FONT color="green">054</FONT>                    b.setParameter(e.getKey(), e.getValue());<a name="line.54"></a>
-<FONT color="green">055</FONT>                }<a name="line.55"></a>
-<FONT color="green">056</FONT>    <a name="line.56"></a>
-<FONT color="green">057</FONT>                return b.build();<a name="line.57"></a>
-<FONT color="green">058</FONT>            }<a name="line.58"></a>
-<FONT color="green">059</FONT>            catch (final URISyntaxException e) {<a name="line.59"></a>
-<FONT color="green">060</FONT>                throw new RuntimeException("Could not build URI", e);<a name="line.60"></a>
-<FONT color="green">061</FONT>            }<a name="line.61"></a>
-<FONT color="green">062</FONT>        }<a name="line.62"></a>
-<FONT color="green">063</FONT>    <a name="line.63"></a>
-<FONT color="green">064</FONT>        private static String bodyMd5(final String body) {<a name="line.64"></a>
-<FONT color="green">065</FONT>            try {<a name="line.65"></a>
-<FONT color="green">066</FONT>                final MessageDigest md = MessageDigest.getInstance("MD5");<a name="line.66"></a>
-<FONT color="green">067</FONT>                final byte[] digest = md.digest(body.getBytes("UTF-8"));<a name="line.67"></a>
-<FONT color="green">068</FONT>                return Hex.encodeHexString(digest);<a name="line.68"></a>
-<FONT color="green">069</FONT>            }<a name="line.69"></a>
-<FONT color="green">070</FONT>            // If this doesn't exist, we're pretty much out of luck.<a name="line.70"></a>
-<FONT color="green">071</FONT>            catch (final NoSuchAlgorithmException e) {<a name="line.71"></a>
-<FONT color="green">072</FONT>                throw new RuntimeException("The Pusher REST client requires MD5 support", e);<a name="line.72"></a>
-<FONT color="green">073</FONT>            }<a name="line.73"></a>
-<FONT color="green">074</FONT>            catch (final UnsupportedEncodingException e) {<a name="line.74"></a>
-<FONT color="green">075</FONT>                throw new RuntimeException("The Pusher REST client needs UTF-8 support", e);<a name="line.75"></a>
-<FONT color="green">076</FONT>            }<a name="line.76"></a>
-<FONT color="green">077</FONT>        }<a name="line.77"></a>
-<FONT color="green">078</FONT>    <a name="line.78"></a>
-<FONT color="green">079</FONT>        public static String sign(final String input, final String secret) {<a name="line.79"></a>
-<FONT color="green">080</FONT>            try {<a name="line.80"></a>
-<FONT color="green">081</FONT>                final Mac mac = Mac.getInstance("HmacSHA256");<a name="line.81"></a>
-<FONT color="green">082</FONT>                mac.init(new SecretKeySpec(secret.getBytes(), "SHA256"));<a name="line.82"></a>
-<FONT color="green">083</FONT>    <a name="line.83"></a>
-<FONT color="green">084</FONT>                final byte[] digest = mac.doFinal(input.getBytes("UTF-8"));<a name="line.84"></a>
-<FONT color="green">085</FONT>                return Hex.encodeHexString(digest);<a name="line.85"></a>
-<FONT color="green">086</FONT>            }<a name="line.86"></a>
-<FONT color="green">087</FONT>            catch (final InvalidKeyException e) {<a name="line.87"></a>
-<FONT color="green">088</FONT>                /// We validate this when the key is first provided, so we should never encounter it here.<a name="line.88"></a>
-<FONT color="green">089</FONT>                throw new RuntimeException("Invalid secret key", e);<a name="line.89"></a>
-<FONT color="green">090</FONT>            }<a name="line.90"></a>
-<FONT color="green">091</FONT>            // If either of these doesn't exist, we're pretty much out of luck.<a name="line.91"></a>
-<FONT color="green">092</FONT>            catch (final NoSuchAlgorithmException e) {<a name="line.92"></a>
-<FONT color="green">093</FONT>                throw new RuntimeException("The Pusher REST client requires HmacSHA256 support", e);<a name="line.93"></a>
-<FONT color="green">094</FONT>            }<a name="line.94"></a>
-<FONT color="green">095</FONT>            catch (final UnsupportedEncodingException e) {<a name="line.95"></a>
-<FONT color="green">096</FONT>                throw new RuntimeException("The Pusher REST client needs UTF-8 support", e);<a name="line.96"></a>
-<FONT color="green">097</FONT>            }<a name="line.97"></a>
-<FONT color="green">098</FONT>        }<a name="line.98"></a>
-<FONT color="green">099</FONT>    <a name="line.99"></a>
-<FONT color="green">100</FONT>        // Visible for testing<a name="line.100"></a>
-<FONT color="green">101</FONT>        static String buildSignatureString(final String method, final String path, final Map&lt;String, String&gt; queryParams) {<a name="line.101"></a>
-<FONT color="green">102</FONT>            final StringBuilder sb = new StringBuilder();<a name="line.102"></a>
-<FONT color="green">103</FONT>            sb.append(method)<a name="line.103"></a>
-<FONT color="green">104</FONT>                .append('\n')<a name="line.104"></a>
-<FONT color="green">105</FONT>                .append(path)<a name="line.105"></a>
-<FONT color="green">106</FONT>                .append('\n');<a name="line.106"></a>
-<FONT color="green">107</FONT>    <a name="line.107"></a>
-<FONT color="green">108</FONT>            final String[] keys = queryParams.keySet().toArray(new String[0]);<a name="line.108"></a>
-<FONT color="green">109</FONT>            Arrays.sort(keys);<a name="line.109"></a>
-<FONT color="green">110</FONT>    <a name="line.110"></a>
-<FONT color="green">111</FONT>            boolean first = true;<a name="line.111"></a>
-<FONT color="green">112</FONT>            for (final String key : keys) {<a name="line.112"></a>
-<FONT color="green">113</FONT>                if (!first) sb.append('&amp;');<a name="line.113"></a>
-<FONT color="green">114</FONT>                else first = false;<a name="line.114"></a>
-<FONT color="green">115</FONT>    <a name="line.115"></a>
-<FONT color="green">116</FONT>                sb.append(key)<a name="line.116"></a>
-<FONT color="green">117</FONT>                    .append('=')<a name="line.117"></a>
-<FONT color="green">118</FONT>                    .append(queryParams.get(key));<a name="line.118"></a>
-<FONT color="green">119</FONT>            }<a name="line.119"></a>
-<FONT color="green">120</FONT>    <a name="line.120"></a>
-<FONT color="green">121</FONT>            return sb.toString();<a name="line.121"></a>
-<FONT color="green">122</FONT>        }<a name="line.122"></a>
-<FONT color="green">123</FONT>    }<a name="line.123"></a>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../styles.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>package com.pusher.rest;<a name="line.1"></a>
+<span class="sourceLineNo">002</span><a name="line.2"></a>
+<span class="sourceLineNo">003</span>import java.io.UnsupportedEncodingException;<a name="line.3"></a>
+<span class="sourceLineNo">004</span>import java.net.URI;<a name="line.4"></a>
+<span class="sourceLineNo">005</span>import java.net.URISyntaxException;<a name="line.5"></a>
+<span class="sourceLineNo">006</span>import java.security.InvalidKeyException;<a name="line.6"></a>
+<span class="sourceLineNo">007</span>import java.security.MessageDigest;<a name="line.7"></a>
+<span class="sourceLineNo">008</span>import java.security.NoSuchAlgorithmException;<a name="line.8"></a>
+<span class="sourceLineNo">009</span>import java.util.Arrays;<a name="line.9"></a>
+<span class="sourceLineNo">010</span>import java.util.HashMap;<a name="line.10"></a>
+<span class="sourceLineNo">011</span>import java.util.Map;<a name="line.11"></a>
+<span class="sourceLineNo">012</span>import java.util.Map.Entry;<a name="line.12"></a>
+<span class="sourceLineNo">013</span><a name="line.13"></a>
+<span class="sourceLineNo">014</span>import javax.crypto.Mac;<a name="line.14"></a>
+<span class="sourceLineNo">015</span>import javax.crypto.spec.SecretKeySpec;<a name="line.15"></a>
+<span class="sourceLineNo">016</span><a name="line.16"></a>
+<span class="sourceLineNo">017</span>import org.apache.commons.codec.binary.Hex;<a name="line.17"></a>
+<span class="sourceLineNo">018</span>import org.apache.http.client.utils.URIBuilder;<a name="line.18"></a>
+<span class="sourceLineNo">019</span><a name="line.19"></a>
+<span class="sourceLineNo">020</span>import com.pusher.rest.util.Prerequisites;<a name="line.20"></a>
+<span class="sourceLineNo">021</span><a name="line.21"></a>
+<span class="sourceLineNo">022</span>public class SignatureUtil {<a name="line.22"></a>
+<span class="sourceLineNo">023</span><a name="line.23"></a>
+<span class="sourceLineNo">024</span>    public static URI uri(final String method,<a name="line.24"></a>
+<span class="sourceLineNo">025</span>                          final String scheme,<a name="line.25"></a>
+<span class="sourceLineNo">026</span>                          final String host,<a name="line.26"></a>
+<span class="sourceLineNo">027</span>                          final String path,<a name="line.27"></a>
+<span class="sourceLineNo">028</span>                          final String body,<a name="line.28"></a>
+<span class="sourceLineNo">029</span>                          final String key,<a name="line.29"></a>
+<span class="sourceLineNo">030</span>                          final String secret,<a name="line.30"></a>
+<span class="sourceLineNo">031</span>                          final Map&lt;String, String&gt; extraParams) {<a name="line.31"></a>
+<span class="sourceLineNo">032</span><a name="line.32"></a>
+<span class="sourceLineNo">033</span>        Prerequisites.noReservedKeys(extraParams);<a name="line.33"></a>
+<span class="sourceLineNo">034</span><a name="line.34"></a>
+<span class="sourceLineNo">035</span>        try {<a name="line.35"></a>
+<span class="sourceLineNo">036</span>            final Map&lt;String, String&gt; allParams = new HashMap&lt;String, String&gt;(extraParams);<a name="line.36"></a>
+<span class="sourceLineNo">037</span>            allParams.put("auth_key", key);<a name="line.37"></a>
+<span class="sourceLineNo">038</span>            allParams.put("auth_version", "1.0");<a name="line.38"></a>
+<span class="sourceLineNo">039</span>            allParams.put("auth_timestamp", new Long(System.currentTimeMillis() / 1000).toString());<a name="line.39"></a>
+<span class="sourceLineNo">040</span>            if (body != null) {<a name="line.40"></a>
+<span class="sourceLineNo">041</span>                allParams.put("body_md5", bodyMd5(body));<a name="line.41"></a>
+<span class="sourceLineNo">042</span>            }<a name="line.42"></a>
+<span class="sourceLineNo">043</span><a name="line.43"></a>
+<span class="sourceLineNo">044</span>            // This is where the auth gets a bit weird. The query params for the request must include<a name="line.44"></a>
+<span class="sourceLineNo">045</span>            // the auth signature which is a signature over all the params except itself.<a name="line.45"></a>
+<span class="sourceLineNo">046</span>            allParams.put("auth_signature", sign(buildSignatureString(method, path, allParams), secret));<a name="line.46"></a>
+<span class="sourceLineNo">047</span><a name="line.47"></a>
+<span class="sourceLineNo">048</span>            final URIBuilder b = new URIBuilder()<a name="line.48"></a>
+<span class="sourceLineNo">049</span>                    .setScheme(scheme)<a name="line.49"></a>
+<span class="sourceLineNo">050</span>                    .setHost(host)<a name="line.50"></a>
+<span class="sourceLineNo">051</span>                    .setPath(path);<a name="line.51"></a>
+<span class="sourceLineNo">052</span><a name="line.52"></a>
+<span class="sourceLineNo">053</span>            for (final Entry&lt;String, String&gt; e : allParams.entrySet()) {<a name="line.53"></a>
+<span class="sourceLineNo">054</span>                b.setParameter(e.getKey(), e.getValue());<a name="line.54"></a>
+<span class="sourceLineNo">055</span>            }<a name="line.55"></a>
+<span class="sourceLineNo">056</span><a name="line.56"></a>
+<span class="sourceLineNo">057</span>            return b.build();<a name="line.57"></a>
+<span class="sourceLineNo">058</span>        }<a name="line.58"></a>
+<span class="sourceLineNo">059</span>        catch (final URISyntaxException e) {<a name="line.59"></a>
+<span class="sourceLineNo">060</span>            throw new RuntimeException("Could not build URI", e);<a name="line.60"></a>
+<span class="sourceLineNo">061</span>        }<a name="line.61"></a>
+<span class="sourceLineNo">062</span>    }<a name="line.62"></a>
+<span class="sourceLineNo">063</span><a name="line.63"></a>
+<span class="sourceLineNo">064</span>    private static String bodyMd5(final String body) {<a name="line.64"></a>
+<span class="sourceLineNo">065</span>        try {<a name="line.65"></a>
+<span class="sourceLineNo">066</span>            final MessageDigest md = MessageDigest.getInstance("MD5");<a name="line.66"></a>
+<span class="sourceLineNo">067</span>            final byte[] digest = md.digest(body.getBytes("UTF-8"));<a name="line.67"></a>
+<span class="sourceLineNo">068</span>            return Hex.encodeHexString(digest);<a name="line.68"></a>
+<span class="sourceLineNo">069</span>        }<a name="line.69"></a>
+<span class="sourceLineNo">070</span>        // If this doesn't exist, we're pretty much out of luck.<a name="line.70"></a>
+<span class="sourceLineNo">071</span>        catch (final NoSuchAlgorithmException e) {<a name="line.71"></a>
+<span class="sourceLineNo">072</span>            throw new RuntimeException("The Pusher REST client requires MD5 support", e);<a name="line.72"></a>
+<span class="sourceLineNo">073</span>        }<a name="line.73"></a>
+<span class="sourceLineNo">074</span>        catch (final UnsupportedEncodingException e) {<a name="line.74"></a>
+<span class="sourceLineNo">075</span>            throw new RuntimeException("The Pusher REST client needs UTF-8 support", e);<a name="line.75"></a>
+<span class="sourceLineNo">076</span>        }<a name="line.76"></a>
+<span class="sourceLineNo">077</span>    }<a name="line.77"></a>
+<span class="sourceLineNo">078</span><a name="line.78"></a>
+<span class="sourceLineNo">079</span>    public static String sign(final String input, final String secret) {<a name="line.79"></a>
+<span class="sourceLineNo">080</span>        try {<a name="line.80"></a>
+<span class="sourceLineNo">081</span>            final Mac mac = Mac.getInstance("HmacSHA256");<a name="line.81"></a>
+<span class="sourceLineNo">082</span>            mac.init(new SecretKeySpec(secret.getBytes(), "SHA256"));<a name="line.82"></a>
+<span class="sourceLineNo">083</span><a name="line.83"></a>
+<span class="sourceLineNo">084</span>            final byte[] digest = mac.doFinal(input.getBytes("UTF-8"));<a name="line.84"></a>
+<span class="sourceLineNo">085</span>            return Hex.encodeHexString(digest);<a name="line.85"></a>
+<span class="sourceLineNo">086</span>        }<a name="line.86"></a>
+<span class="sourceLineNo">087</span>        catch (final InvalidKeyException e) {<a name="line.87"></a>
+<span class="sourceLineNo">088</span>            /// We validate this when the key is first provided, so we should never encounter it here.<a name="line.88"></a>
+<span class="sourceLineNo">089</span>            throw new RuntimeException("Invalid secret key", e);<a name="line.89"></a>
+<span class="sourceLineNo">090</span>        }<a name="line.90"></a>
+<span class="sourceLineNo">091</span>        // If either of these doesn't exist, we're pretty much out of luck.<a name="line.91"></a>
+<span class="sourceLineNo">092</span>        catch (final NoSuchAlgorithmException e) {<a name="line.92"></a>
+<span class="sourceLineNo">093</span>            throw new RuntimeException("The Pusher REST client requires HmacSHA256 support", e);<a name="line.93"></a>
+<span class="sourceLineNo">094</span>        }<a name="line.94"></a>
+<span class="sourceLineNo">095</span>        catch (final UnsupportedEncodingException e) {<a name="line.95"></a>
+<span class="sourceLineNo">096</span>            throw new RuntimeException("The Pusher REST client needs UTF-8 support", e);<a name="line.96"></a>
+<span class="sourceLineNo">097</span>        }<a name="line.97"></a>
+<span class="sourceLineNo">098</span>    }<a name="line.98"></a>
+<span class="sourceLineNo">099</span><a name="line.99"></a>
+<span class="sourceLineNo">100</span>    // Visible for testing<a name="line.100"></a>
+<span class="sourceLineNo">101</span>    static String buildSignatureString(final String method, final String path, final Map&lt;String, String&gt; queryParams) {<a name="line.101"></a>
+<span class="sourceLineNo">102</span>        final StringBuilder sb = new StringBuilder();<a name="line.102"></a>
+<span class="sourceLineNo">103</span>        sb.append(method)<a name="line.103"></a>
+<span class="sourceLineNo">104</span>            .append('\n')<a name="line.104"></a>
+<span class="sourceLineNo">105</span>            .append(path)<a name="line.105"></a>
+<span class="sourceLineNo">106</span>            .append('\n');<a name="line.106"></a>
+<span class="sourceLineNo">107</span><a name="line.107"></a>
+<span class="sourceLineNo">108</span>        final String[] keys = queryParams.keySet().toArray(new String[0]);<a name="line.108"></a>
+<span class="sourceLineNo">109</span>        Arrays.sort(keys);<a name="line.109"></a>
+<span class="sourceLineNo">110</span><a name="line.110"></a>
+<span class="sourceLineNo">111</span>        boolean first = true;<a name="line.111"></a>
+<span class="sourceLineNo">112</span>        for (final String key : keys) {<a name="line.112"></a>
+<span class="sourceLineNo">113</span>            if (!first) sb.append('&amp;');<a name="line.113"></a>
+<span class="sourceLineNo">114</span>            else first = false;<a name="line.114"></a>
+<span class="sourceLineNo">115</span><a name="line.115"></a>
+<span class="sourceLineNo">116</span>            sb.append(key)<a name="line.116"></a>
+<span class="sourceLineNo">117</span>                .append('=')<a name="line.117"></a>
+<span class="sourceLineNo">118</span>                .append(queryParams.get(key));<a name="line.118"></a>
+<span class="sourceLineNo">119</span>        }<a name="line.119"></a>
+<span class="sourceLineNo">120</span><a name="line.120"></a>
+<span class="sourceLineNo">121</span>        return sb.toString();<a name="line.121"></a>
+<span class="sourceLineNo">122</span>    }<a name="line.122"></a>
+<span class="sourceLineNo">123</span>}<a name="line.123"></a>
 
 
 
@@ -184,6 +189,7 @@
 
 
 
-</PRE>
-</BODY>
-</HTML>
+</pre>
+</div>
+</body>
+</html>
