@@ -129,11 +129,11 @@ public class Pusher {
      */
 
     /**
-     * Set the API endpoint host.
-     * <p>
      * For testing or specifying an alternative cluster. See also {@link #setCluster(String)} for the latter.
      * <p>
      * Default: api.pusherapp.com
+     *
+     * @param host the API endpoint host
      */
     public void setHost(final String host) {
         Prerequisites.nonNull("host", host);
@@ -142,11 +142,11 @@ public class Pusher {
     }
 
     /**
-     * Set the Pusher cluster to target.
-     * <p>
      * For Specifying an alternative cluster.
      * <p>
      * See also {@link #setHost(String)} for targetting an arbitrary endpoint.
+     *
+     * @param cluster the Pusher cluster to target
      */
     public void setCluster(final String cluster) {
         Prerequisites.nonNull("cluster", cluster);
@@ -162,15 +162,17 @@ public class Pusher {
      * sensitive information.
      * <p>
      * Default: false
+     *
+     * @param encrypted whether to use SSL to contact the API
      */
     public void setEncrypted(final boolean encrypted) {
         this.scheme = encrypted ? "https" : "http";
     }
 
     /**
-     * Set the request timeout in milliseconds
-     * <p>
-     * Default 4000
+     * Default: 4000
+     *
+     * @param requestTimeout the request timeout in milliseconds
      */
     public void setRequestTimeout(final int requestTimeout) {
         this.requestTimeout = requestTimeout;
@@ -185,6 +187,8 @@ public class Pusher {
      * here, you may exert control over the marshalling, for example choosing how Java property
      * names are mapped on to the field names in the JSON representation, allowing you to match
      * the expected scheme on the client side.
+     *
+     * @param gson a GSON instance configured to your liking
      */
     public void setGsonSerialiser(final Gson gson) {
         this.dataMarshaller = gson;
@@ -198,6 +202,8 @@ public class Pusher {
      * applied to all subsequent calls.
      *
      * @see #configureHttpClient(HttpClientBuilder)
+     *
+     * @return an {@link org.apache.http.impl.client.HttpClientBuilder} with the default settings applied
      */
     public static HttpClientBuilder defaultHttpClientBuilder() {
         return HttpClientBuilder.create()
@@ -230,6 +236,9 @@ public class Pusher {
      * </pre>
      *
      * @see #defaultHttpClientBuilder()
+     *
+     * @param builder an {@link org.apache.http.impl.client.HttpClientBuilder} with which to configure
+     * the internal HTTP client
      */
     public void configureHttpClient(final HttpClientBuilder builder) {
         try {
@@ -250,7 +259,6 @@ public class Pusher {
      * to elide the default serialisation:
      * <pre>
      * Pusher pusher = new Pusher(appId, key, secret) {
-     *     &commat;Override
      *     protected String serialise(final Object data) {
      *         return (String)data;
      *     }
@@ -258,6 +266,9 @@ public class Pusher {
      *
      * pusher.trigger("my-channel", "my-event", "{\"my-data\":\"my-value\"}");
      * </pre>
+     *
+     * @param data an unserialised event payload
+     * @return a serialised event payload
      */
     protected String serialise(final Object data) {
         return dataMarshaller.toJson(data);
@@ -275,6 +286,11 @@ public class Pusher {
      * <p>
      * Note that if you do not wish to create classes specifically for the purpose of specifying
      * the message payload, use Map&lt;String, Object&gt;. These maps will nest just fine.
+     *
+     * @param channel the channel name on which to trigger the event
+     * @param eventName the name given to the event
+     * @param data an object which will be serialised to create the event body
+     * @return a {@link Result} object encapsulating the success state and response to the request
      */
     public Result trigger(final String channel, final String eventName, final Object data) {
         return trigger(channel, eventName, data, null);
@@ -282,6 +298,11 @@ public class Pusher {
 
     /**
      * Publish identical messages to multiple channels.
+     *
+     * @param channels the channel names on which to trigger the event
+     * @param eventName the name given to the event
+     * @param data an object which will be serialised to create the event body
+     * @return a {@link Result} object encapsulating the success state and response to the request
      */
     public Result trigger(final List<String> channels, final String eventName, final Object data) {
         return trigger(channels, eventName, data, null);
@@ -289,6 +310,12 @@ public class Pusher {
 
     /**
      * Publish a message to a single channel, excluding the specified socketId from receiving the message.
+     *
+     * @param channel the channel name on which to trigger the event
+     * @param eventName the name given to the event
+     * @param data an object which will be serialised to create the event body
+     * @param socketId a socket id which should be excluded from receiving the event
+     * @return a {@link Result} object encapsulating the success state and response to the request
      */
     public Result trigger(final String channel, final String eventName, final Object data, final String socketId) {
         return trigger(Collections.singletonList(channel), eventName, data, socketId);
@@ -296,6 +323,12 @@ public class Pusher {
 
     /**
      * Publish identical messages to multiple channels, excluding the specified socketId from receiving the message.
+     *
+     * @param channels the channel names on which to trigger the event
+     * @param eventName the name given to the event
+     * @param data an object which will be serialised to create the event body
+     * @param socketId a socket id which should be excluded from receiving the event
+     * @return a {@link Result} object encapsulating the success state and response to the request
      */
     public Result trigger(final List<String> channels, final String eventName, final Object data, final String socketId) {
         Prerequisites.nonNull("channels", channels);
@@ -319,6 +352,9 @@ public class Pusher {
      * NOTE: the path specified here is relative to that of your app. For example, to access
      * the channel list for your app, simply pass "/channels". Do not include the "/apps/[appId]"
      * at the beginning of the path.
+     *
+     * @param path the path (e.g. /channels) to query
+     * @return a {@link Result} object encapsulating the success state and response to the request
      */
     public Result get(final String path) {
         return get(path, Collections.<String, String>emptyMap());
@@ -335,6 +371,10 @@ public class Pusher {
      * NOTE: the path specified here is relative to that of your app. For example, to access
      * the channel list for your app, simply pass "/channels". Do not include the "/apps/[appId]"
      * at the beginning of the path.
+     *
+     * @param path the path (e.g. /channels) to query
+     * @param parameters query parameters to submit with the request
+     * @return a {@link Result} object encapsulating the success state and response to the request
      */
     public Result get(final String path, final Map<String, String> parameters) {
         final String fullPath = "/apps/" + appId + path;
@@ -353,6 +393,10 @@ public class Pusher {
      * NOTE: the path specified here is relative to that of your app. For example, to access
      * the channel list for your app, simply pass "/channels". Do not include the "/apps/[appId]"
      * at the beginning of the path.
+     *
+     * @param path the path (e.g. /channels) to submit
+     * @param body the body to submit
+     * @return a {@link Result} object encapsulating the success state and response to the request
      */
     public Result post(final String path, final String body) {
         final String fullPath = "/apps/" + appId + path;
@@ -392,6 +436,11 @@ public class Pusher {
     /**
      * If you wanted to send the REST API requests manually (e.g. using a different HTTP client), this method
      * will return a java.net.URI which includes all of the appropriate query parameters which sign the request.
+     *
+     * @param method the HTTP method, e.g. GET, POST
+     * @param path the HTTP path, e.g. /channels
+     * @param body the HTTP request body, if there is one (otherwise pass null)
+     * @return a URI object which includes the necessary query params for request authentication
      */
     public URI signedUri(final String method, final String path, final String body) {
         return signedUri(method, path, body, Collections.<String, String>emptyMap());
@@ -402,6 +451,12 @@ public class Pusher {
      * will return a java.net.URI which includes all of the appropriate query parameters which sign the request.
      * <p>
      * Note that any further query parameters you wish to be add must be specified here, as they form part of the signature.
+     *
+     * @param method the HTTP method, e.g. GET, POST
+     * @param path the HTTP path, e.g. /channels
+     * @param body the HTTP request body, if there is one (otherwise pass null)
+     * @param parameters HTTP query parameters to be included in the request
+     * @return a URI object which includes the necessary query params for request authentication
      */
     public URI signedUri(final String method, final String path, final String body, final Map<String, String> parameters) {
         return SignatureUtil.uri(method, scheme, host, path, body, key, secret, parameters);
@@ -415,6 +470,10 @@ public class Pusher {
      * Generate authentication response to authorise a user on a private channel
      * <p>
      * The return value is the complete body which should be returned to a client requesting authorisation.
+     *
+     * @param socketId the socket id of the connection to authenticate
+     * @param channel the name of the channel which the socket id should be authorised to join
+     * @return an authentication string, suitable for return to the requesting client
      */
     public String authenticate(final String socketId, final String channel) {
         Prerequisites.nonNull("socketId", socketId);
@@ -437,6 +496,11 @@ public class Pusher {
      * Generate authentication response to authorise a user on a presence channel
      * <p>
      * The return value is the complete body which should be returned to a client requesting authorisation.
+     *
+     * @param socketId the socket id of the connection to authenticate
+     * @param channel the name of the channel which the socket id should be authorised to join
+     * @param user a {@link PresenceUser} object which represents the channel data to be associated with the user
+     * @return an authentication string, suitable for return to the requesting client
      */
     public String authenticate(final String socketId, final String channel, final PresenceUser user) {
         Prerequisites.nonNull("socketId", socketId);
@@ -461,6 +525,14 @@ public class Pusher {
      * WEBHOOK VALIDATION
      */
 
+    /**
+     * Check the signature on a webhook received from Pusher
+     *
+     * @param xPusherKeyHeader the X-Pusher-Key header as received in the webhook request
+     * @param xPusherSignatureHeader the X-Pusher-Signature header as received in the webhook request
+     * @param body the webhook body
+     * @return enum representing the possible validities of the webhook request
+     */
     public Validity validateWebhookSignature(final String xPusherKeyHeader, final String xPusherSignatureHeader, final String body) {
         if (!xPusherKeyHeader.trim().equals(key)) {
             // We can't validate the signature, because it was signed with a different key to the one we were initialised with.

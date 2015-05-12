@@ -7,6 +7,9 @@ public class AuthData {
 
     /**
      * Private channel constructor
+     *
+     * @param key App key
+     * @param signature Auth signature
      */
     public AuthData(final String key, final String signature) {
         this(key, signature, null);
@@ -14,6 +17,10 @@ public class AuthData {
 
     /**
      * Presence channel constructor
+     *
+     * @param key App key
+     * @param signature Auth signature
+     * @param channelData Extra user data
      */
     public AuthData(final String key, final String signature, final String channelData) {
         this.auth = key + ":" + signature;

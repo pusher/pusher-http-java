@@ -25,7 +25,7 @@ public class Result {
         }
 
         /**
-         * Whether the call should be retried without modification with an expectation of success
+         * @return whether the call should be retried without modification with an expectation of success
          */
         public boolean shouldRetry() {
             return shouldRetry;
@@ -42,6 +42,13 @@ public class Result {
         this.message = message;
     }
 
+    /**
+     * Factory method
+     *
+     * @param statusCode HTTP status code
+     * @param responseBody HTTP response body
+     * @return a Result encapsulating the params
+     */
     public static Result fromHttpCode(final int statusCode, final String responseBody) {
         final Status status;
         switch (statusCode) {
@@ -67,30 +74,42 @@ public class Result {
         return new Result(status, statusCode, responseBody);
     }
 
+    /**
+     * Factory method
+     *
+     * @param e cause
+     * @return a Result encapsulating the params
+     */
     public static Result fromException(final IOException e) {
         return new Result(Status.NETWORK_ERROR, null, e.toString());
     }
 
+    /**
+     * Factory method
+     *
+     * @param e cause
+     * @return a Result encapsulating the params
+     */
     public static Result fromException(final ClientProtocolException e) {
         return new Result(Status.UNKNOWN_ERROR, null, e.toString());
     }
 
     /**
-     * Get the enum classifying the result of the call
+     * @return the enum classifying the result of the call
      */
     public Status getStatus() {
         return status;
     }
 
     /**
-     * Get the data response (success) or descriptive message (error) returned from the call
+     * @return the data response (success) or descriptive message (error) returned from the call
      */
     public String getMessage() {
         return message;
     }
 
     /**
-     * Get the HTTP status code of the call, useful for debugging instances of UNKNOWN_ERROR
+     * @return the HTTP status code of the call, useful for debugging instances of UNKNOWN_ERROR
      */
     public Integer getHttpStatus() {
         return httpStatus;
