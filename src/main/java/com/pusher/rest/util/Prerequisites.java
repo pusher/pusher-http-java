@@ -79,7 +79,7 @@ public final class Prerequisites {
         }
     }
 
-    public static void matchesRegex(final String name, final Pattern regex, final String toMatch) {
+    private static void matchesRegex(final String name, final Pattern regex, final String toMatch) {
         nonNull(name, toMatch);
         if (!regex.matcher(toMatch).matches()) {
             throw new IllegalArgumentException(name + " [" + toMatch + "] is not valid");
