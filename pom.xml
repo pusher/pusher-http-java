@@ -43,7 +43,7 @@
 
   <issueManagement>
     <system>Github</system>
-    <url>https://github.com/pusher/pusher-java-client/issues</url>
+    <url>https://github.com/pusher/pusher-http-java/issues</url>
   </issueManagement>
 
   <developers>
