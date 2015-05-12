@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -56,6 +57,29 @@ public final class Prerequisites {
         catch (final InvalidKeyException e) {
             // Failed the test
             throw new IllegalArgumentException("Parameter [" + name + "] must be a valid SHA256 key", e);
+        }
+    }
+
+    public static void areValidChannels(final List<String> channels) {
+        for (String channel : channels) {
+            isValidChannel(channel);
+        }
+    }
+
+    public static void isValidChannel(final String channel) {
+        matchesRegex("channel", "\\A[-a-zA-Z0-9_=@,.;]+\\z", channel);
+    }
+
+    public static void isValidSocketId(final String socketId) {
+        if (socketId != null) {
+            matchesRegex("socket_id", "\\A\\d+\\.\\d+\\z", socketId);
+        }
+    }
+
+    public static void matchesRegex(final String name, final String regex, final String toMatch) {
+        nonNull(name, toMatch);
+        if (!Pattern.matches(regex, toMatch)) {
+            throw new IllegalArgumentException(name + " [" + toMatch + "] is not valid");
         }
     }
 }
