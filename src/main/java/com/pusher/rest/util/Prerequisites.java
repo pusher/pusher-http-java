@@ -14,6 +14,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 public final class Prerequisites {
 
+    private static final Pattern VALID_CHANNEL = Pattern.compile("\\A[-a-zA-Z0-9_=@,.;]+\\z");
+    private static final Pattern VALID_SOCKET_ID = Pattern.compile("\\A\\d+\\.\\d+\\z");
+
     private static final Set<String> RESERVED_QUERY_KEYS = new HashSet<String>(
             Arrays.asList(new String[] { "auth_key", "auth_timestamp", "auth_version", "auth_signature", "body_md5" }));
 
@@ -67,18 +70,18 @@ public final class Prerequisites {
     }
 
     public static void isValidChannel(final String channel) {
-        matchesRegex("channel", "\\A[-a-zA-Z0-9_=@,.;]+\\z", channel);
+        matchesRegex("channel", VALID_CHANNEL, channel);
     }
 
     public static void isValidSocketId(final String socketId) {
         if (socketId != null) {
-            matchesRegex("socket_id", "\\A\\d+\\.\\d+\\z", socketId);
+            matchesRegex("socket_id", VALID_SOCKET_ID, socketId);
         }
     }
 
-    public static void matchesRegex(final String name, final String regex, final String toMatch) {
+    public static void matchesRegex(final String name, final Pattern regex, final String toMatch) {
         nonNull(name, toMatch);
-        if (!Pattern.matches(regex, toMatch)) {
+        if (!regex.matcher(toMatch).matches()) {
             throw new IllegalArgumentException(name + " [" + toMatch + "] is not valid");
         }
     }
