@@ -7,11 +7,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 public final class Prerequisites {
+
+    private static final Pattern VALID_CHANNEL = Pattern.compile("\\A[-a-zA-Z0-9_=@,.;]+\\z");
+    private static final Pattern VALID_SOCKET_ID = Pattern.compile("\\A\\d+\\.\\d+\\z");
 
     private static final Set<String> RESERVED_QUERY_KEYS = new HashSet<String>(
             Arrays.asList(new String[] { "auth_key", "auth_timestamp", "auth_version", "auth_signature", "body_md5" }));
@@ -56,6 +60,29 @@ public final class Prerequisites {
         catch (final InvalidKeyException e) {
             // Failed the test
             throw new IllegalArgumentException("Parameter [" + name + "] must be a valid SHA256 key", e);
+        }
+    }
+
+    public static void areValidChannels(final List<String> channels) {
+        for (String channel : channels) {
+            isValidChannel(channel);
+        }
+    }
+
+    public static void isValidChannel(final String channel) {
+        matchesRegex("channel", VALID_CHANNEL, channel);
+    }
+
+    public static void isValidSocketId(final String socketId) {
+        if (socketId != null) {
+            matchesRegex("socket_id", VALID_SOCKET_ID, socketId);
+        }
+    }
+
+    private static void matchesRegex(final String name, final Pattern regex, final String toMatch) {
+        nonNull(name, toMatch);
+        if (!regex.matcher(toMatch).matches()) {
+            throw new IllegalArgumentException(name + " [" + toMatch + "] is not valid");
         }
     }
 }
