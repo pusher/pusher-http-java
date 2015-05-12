@@ -41,6 +41,11 @@ public class PusherChannelAuthTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void trailingNLSocketId() {
+        p.authenticate("1.1\n", "private-foobar");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void leadingColonSocketId() {
         p.authenticate(":1.1", "private-foobar");
     }
@@ -73,6 +78,11 @@ public class PusherChannelAuthTest {
     @Test(expected = IllegalArgumentException.class)
     public void trailingColonNLChannel() {
         p.authenticate("1.1", "private-foobar\n:");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void trailingNLChannel() {
+        p.authenticate("1.1", "private-foobar\n");
     }
 
     @Test
