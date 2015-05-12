@@ -1,4 +1,4 @@
-# Pusher Java REST library
+# Pusher Java HTTP library
 
 [![Build
 Status](https://travis-ci.org/pusher/pusher-http-java.svg?branch=master)](https://travis-ci.org/pusher/pusher-http-java)
@@ -12,8 +12,8 @@ The pusher-http-java library is available in Maven Central:
 ```
 <dependency>
   <groupId>com.pusher</groupId>
-  <artifactId>pusher-rest-java</artifactId>
-  <version>0.9.0</version>
+  <artifactId>pusher-http-java</artifactId>
+  <version>0.9.1</version>
 </dependency>
 ```
 
