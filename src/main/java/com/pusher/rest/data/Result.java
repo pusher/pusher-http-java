@@ -36,7 +36,7 @@ public class Result {
     private final Integer httpStatus;
     private final String message;
 
-    private Result(final Status status, final Integer httpStatus, final String message) {
+    protected Result(final Status status, final Integer httpStatus, final String message) {
         this.status = status;
         this.httpStatus = httpStatus;
         this.message = message;

@@ -21,15 +21,15 @@ import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
-import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import com.pusher.rest.data.AuthData;
 import com.pusher.rest.data.PresenceUser;
 import com.pusher.rest.data.Result;
 import com.pusher.rest.data.TriggerData;
+import com.pusher.rest.data.TriggerResult;
 import com.pusher.rest.data.Validity;
+import com.pusher.rest.util.Marshal;
 import com.pusher.rest.util.Prerequisites;
 
 /**
@@ -42,7 +42,7 @@ import com.pusher.rest.util.Prerequisites;
  * // Init
  * Pusher pusher = new Pusher(APP_ID, KEY, SECRET);
  * // Publish
- * Result triggerResult = pusher.trigger("my-channel", "my-eventname", myPojoForSerialisation);
+ * TriggerResult triggerResult = pusher.trigger("my-channel", "my-eventname", myPojoForSerialisation);
  * if (triggerResult.getStatus() != Status.SUCCESS) {
  *   if (triggerResult.getStatus().shouldRetry()) {
  *     // Temporary, let's schedule a retry
@@ -61,10 +61,6 @@ import com.pusher.rest.util.Prerequisites;
  * </pre>
  */
 public class Pusher {
-    private static final Gson BODY_SERIALISER = new GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-            .create();
-
     private static final Pattern HEROKU_URL = Pattern.compile("(https?)://(.+):(.+)@(.+:?.*)/apps/(.+)");
 
     private final String appId;
@@ -292,7 +288,7 @@ public class Pusher {
      * @param data an object which will be serialised to create the event body
      * @return a {@link Result} object encapsulating the success state and response to the request
      */
-    public Result trigger(final String channel, final String eventName, final Object data) {
+    public TriggerResult trigger(final String channel, final String eventName, final Object data) {
         return trigger(channel, eventName, data, null);
     }
 
@@ -304,7 +300,7 @@ public class Pusher {
      * @param data an object which will be serialised to create the event body
      * @return a {@link Result} object encapsulating the success state and response to the request
      */
-    public Result trigger(final List<String> channels, final String eventName, final Object data) {
+    public TriggerResult trigger(final List<String> channels, final String eventName, final Object data) {
         return trigger(channels, eventName, data, null);
     }
 
@@ -317,7 +313,7 @@ public class Pusher {
      * @param socketId a socket id which should be excluded from receiving the event
      * @return a {@link Result} object encapsulating the success state and response to the request
      */
-    public Result trigger(final String channel, final String eventName, final Object data, final String socketId) {
+    public TriggerResult trigger(final String channel, final String eventName, final Object data, final String socketId) {
         return trigger(Collections.singletonList(channel), eventName, data, socketId);
     }
 
@@ -330,7 +326,7 @@ public class Pusher {
      * @param socketId a socket id which should be excluded from receiving the event
      * @return a {@link Result} object encapsulating the success state and response to the request
      */
-    public Result trigger(final List<String> channels, final String eventName, final Object data, final String socketId) {
+    public TriggerResult trigger(final List<String> channels, final String eventName, final Object data, final String socketId) {
         Prerequisites.nonNull("channels", channels);
         Prerequisites.nonNull("eventName", eventName);
         Prerequisites.nonNull("data", data);
@@ -339,9 +335,9 @@ public class Pusher {
         Prerequisites.areValidChannels(channels);
         Prerequisites.isValidSocketId(socketId);
 
-        final String body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
+        final String body = Marshal.GSON.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
 
-        return post("/events", body);
+        return TriggerResult.fromResult(post("/events", body));
     }
 
     /**
@@ -489,7 +485,7 @@ public class Pusher {
         }
 
         final String signature = SignatureUtil.sign(socketId + ":" + channel, secret);
-        return BODY_SERIALISER.toJson(new AuthData(key, signature));
+        return Marshal.GSON.toJson(new AuthData(key, signature));
     }
 
     /**
@@ -516,9 +512,9 @@ public class Pusher {
             throw new IllegalArgumentException("Authentication is only applicable to private and presence channels");
         }
 
-        final String channelData = BODY_SERIALISER.toJson(user);
+        final String channelData = Marshal.GSON.toJson(user);
         final String signature = SignatureUtil.sign(socketId + ":" + channel + ":" + channelData, secret);
-        return BODY_SERIALISER.toJson(new AuthData(key, signature, channelData));
+        return Marshal.GSON.toJson(new AuthData(key, signature, channelData));
     }
 
     /*
