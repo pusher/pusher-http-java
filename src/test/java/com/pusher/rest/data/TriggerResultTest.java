@@ -1,4 +1,4 @@
-package com.pusher.rest;
+package com.pusher.rest.data;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNull;
