@@ -121,6 +121,24 @@ In order to avoid the client that triggered the event from also receiving it, th
 pusher.trigger(channel, event, data, "1302.1081607");
 ```
 
+#### Event Buffer
+
+Version 0.10.0 of the library introduced support for event buffering. The purpose of this functionality is to ensure that events that are triggered during whilst a client is offline for a short period of time will still be delivered upon reconnection.
+
+Note: this requires your Pusher application to be on a cluster that has the Event Buffer capability.
+
+As part of this the trigger function now returns a set of event_id values for each event triggered on a channel. These can then be used by the client to tell the Pusher service the last event it has received. If additional events have been triggered after that event ID the service has the opportunity to provide the client with those IDs.
+
+##### Example
+
+```java
+import com.pusher.rest.data.TriggerResult;
+
+Pusher pusher = new Pusher(appId, key, secret);
+TriggerResult res = pusher.trigger("test_channel", "my_event", Collections.singletonMap("message", "hello world"));
+System.out.println(res.getEventIDs()); // {test_channel=eudhq180lonemp}
+```
+
 ### Authenticating private channels
 
 To authorise your users to access private channels on Pusher, you can use the `authenticate` method. This method returns the response body which should be returned to the user requesting authentication.
