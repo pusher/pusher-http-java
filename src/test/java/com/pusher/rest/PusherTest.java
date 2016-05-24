@@ -22,6 +22,8 @@ import org.junit.Test;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.GsonBuilder;
 
+import com.pusher.rest.data.Event;
+
 /**
  * Tests which mock the HttpClient to check outgoing requests
  */
@@ -133,6 +135,12 @@ public class PusherTest {
         }});
 
         p.trigger(channels, "event", Collections.singletonMap("name", "value"));
+    }
+
+
+    @Test
+    public void eventList() throws Exception {
+        throw new Exception();
     }
 
     @Test(expected = IllegalArgumentException.class)

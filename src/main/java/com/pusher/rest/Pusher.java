@@ -29,6 +29,7 @@ import com.pusher.rest.data.AuthData;
 import com.pusher.rest.data.PresenceUser;
 import com.pusher.rest.data.Result;
 import com.pusher.rest.data.TriggerData;
+import com.pusher.rest.data.Event;
 import com.pusher.rest.data.Validity;
 import com.pusher.rest.util.Prerequisites;
 
@@ -342,6 +343,16 @@ public class Pusher {
         final String body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
 
         return post("/events", body);
+    }
+
+    public Result trigger(final List<Event> events){
+
+        Prerequisites.maxLength("events", 10, events);
+        // TODO: add Prerequisites
+
+        final String body = BODY_SERIALISER.toJson(events);
+
+        return post("/batch_events", body);
     }
 
     /**
