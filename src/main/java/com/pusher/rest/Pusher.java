@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +27,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import com.pusher.rest.data.AuthData;
+import com.pusher.rest.data.Event;
+import com.pusher.rest.data.EventBatch;
 import com.pusher.rest.data.PresenceUser;
 import com.pusher.rest.data.Result;
 import com.pusher.rest.data.TriggerData;
@@ -342,6 +345,31 @@ public class Pusher {
         final String body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
 
         return post("/events", body);
+    }
+
+    /**
+     * Publish a batch of different events with a single API call.
+     *
+     * The batch is limited to 10 events on our multi-tenant clusters.
+     *
+     * @param batch a list of events to publish
+     * @return a {@link Result} object encapsulating the success state and response to the request
+     */
+    public Result trigger(final List<Event> batch) {
+        final List<Event> eventsWithSerialisedBodies = new ArrayList<Event>(batch.size());
+        for (final Event e : batch) {
+            eventsWithSerialisedBodies.add(
+                new Event(
+                    e.getChannel(),
+                    e.getName(),
+                    serialise(e.getData()),
+                    e.getSocketId()
+                )
+            );
+        }
+        final String body = BODY_SERIALISER.toJson(new EventBatch(eventsWithSerialisedBodies));
+
+        return post("/batch_events", body);
     }
 
     /**
