@@ -55,7 +55,7 @@ public final class Prerequisites {
         }
         catch (final NoSuchAlgorithmException e) {
             // Out of luck.
-            throw new RuntimeException("The Pusher REST client requires HmacSHA256 support", e);
+            throw new RuntimeException("The Pusher HTTP client requires HmacSHA256 support", e);
         }
         catch (final InvalidKeyException e) {
             // Failed the test

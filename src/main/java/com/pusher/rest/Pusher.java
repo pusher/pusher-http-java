@@ -36,7 +36,7 @@ import com.pusher.rest.data.Validity;
 import com.pusher.rest.util.Prerequisites;
 
 /**
- * A library for interacting with the Pusher REST API.
+ * A library for interacting with the Pusher HTTP API.
  * <p>
  * See http://github.com/pusher/pusher-http-java for an overview
  * <p>
@@ -373,7 +373,7 @@ public class Pusher {
     }
 
     /**
-     * Make a generic REST call to the Pusher API.
+     * Make a generic HTTP call to the Pusher API.
      * <p>
      * See: http://pusher.com/docs/rest_api
      * <p>
@@ -389,11 +389,11 @@ public class Pusher {
     }
 
     /**
-     * Make a generic REST call to the Pusher API.
+     * Make a generic HTTP call to the Pusher API.
      * <p>
      * See: http://pusher.com/docs/rest_api
      * <p>
-     * Parameters should be a map of query parameters for the REST call, and may be null
+     * Parameters should be a map of query parameters for the HTTP call, and may be null
      * if none are required.
      * <p>
      * NOTE: the path specified here is relative to that of your app. For example, to access
@@ -412,7 +412,7 @@ public class Pusher {
     }
 
     /**
-     * Make a generic REST call to the Pusher API.
+     * Make a generic HTTP call to the Pusher API.
      * <p>
      * The body should be a UTF-8 encoded String
      * <p>
@@ -462,7 +462,7 @@ public class Pusher {
     }
 
     /**
-     * If you wanted to send the REST API requests manually (e.g. using a different HTTP client), this method
+     * If you wanted to send the HTTP API requests manually (e.g. using a different HTTP client), this method
      * will return a java.net.URI which includes all of the appropriate query parameters which sign the request.
      *
      * @param method the HTTP method, e.g. GET, POST
@@ -475,7 +475,7 @@ public class Pusher {
     }
 
     /**
-     * If you wanted to send the REST API requests manually (e.g. using a different HTTP client), this method
+     * If you wanted to send the HTTP API requests manually (e.g. using a different HTTP client), this method
      * will return a java.net.URI which includes all of the appropriate query parameters which sign the request.
      * <p>
      * Note that any further query parameters you wish to be add must be specified here, as they form part of the signature.

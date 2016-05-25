@@ -69,10 +69,10 @@ public class SignatureUtil {
         }
         // If this doesn't exist, we're pretty much out of luck.
         catch (final NoSuchAlgorithmException e) {
-            throw new RuntimeException("The Pusher REST client requires MD5 support", e);
+            throw new RuntimeException("The Pusher HTTP client requires MD5 support", e);
         }
         catch (final UnsupportedEncodingException e) {
-            throw new RuntimeException("The Pusher REST client needs UTF-8 support", e);
+            throw new RuntimeException("The Pusher HTTP client needs UTF-8 support", e);
         }
     }
 
@@ -90,10 +90,10 @@ public class SignatureUtil {
         }
         // If either of these doesn't exist, we're pretty much out of luck.
         catch (final NoSuchAlgorithmException e) {
-            throw new RuntimeException("The Pusher REST client requires HmacSHA256 support", e);
+            throw new RuntimeException("The Pusher HTTP client requires HmacSHA256 support", e);
         }
         catch (final UnsupportedEncodingException e) {
-            throw new RuntimeException("The Pusher REST client needs UTF-8 support", e);
+            throw new RuntimeException("The Pusher HTTP client needs UTF-8 support", e);
         }
     }
 

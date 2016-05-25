@@ -164,7 +164,7 @@ if (result.getStatus() == Status.SUCCESS) {
 }
 ```
 
-Information on the optional `params` and the structure of the returned JSON is defined in the [REST API reference](http://pusher.com/docs/rest_api#method-get-channels).
+Information on the optional `params` and the structure of the returned JSON is defined in the [HTTP API reference](http://pusher.com/docs/rest_api#method-get-channels).
 
 #### Get the state of a channel
 
@@ -172,7 +172,7 @@ Information on the optional `params` and the structure of the returned JSON is d
 Result result = pusher.get("/channels/[channel_name]");
 ```
 
-Information on the optional `params` option property and the structure of the returned JSON is defined in the [REST API reference](http://pusher.com/docs/rest_api#method-get-channel).
+Information on the optional `params` option property and the structure of the returned JSON is defined in the [HTTP API reference](http://pusher.com/docs/rest_api#method-get-channel).
 
 #### Get the list of users in a presence channel
 
@@ -180,7 +180,7 @@ Information on the optional `params` option property and the structure of the re
 Result result = pusher.get("/channels/[channel_name]/users");
 ```
 
-The `channel_name` in the path must be a [presence channel](http://pusher.com/docs/presence). The structure of the returned JSON is defined in the [REST API reference](http://pusher.com/docs/rest_api#method-get-users).
+The `channel_name` in the path must be a [presence channel](http://pusher.com/docs/presence). The structure of the returned JSON is defined in the [HTTP API reference](http://pusher.com/docs/rest_api#method-get-users).
 
 ### WebHooks
 
@@ -188,9 +188,9 @@ The library provides a simple helper to validate the authenticity of webhooks re
 
 Call `validateWebhookSignature` with the values from the `X-Pusher-Key` and `X-Pusher-Signature` headers from the webhook request, and the body as a String. You will receive a member of `Validity` indicating whether the webhook could be validated or not.
 
-### Generating REST API signatures
+### Generating HTTP API signatures
 
-If you wanted to send the REST API requests manually (e.g. using a different HTTP client), you can use the `signedUri` method to generate a java.net.URI for your request which contains the necessary signatures:
+If you wanted to send the HTTP API requests manually (e.g. using a different HTTP client), you can use the `signedUri` method to generate a java.net.URI for your request which contains the necessary signatures:
 
 ```java
 URI requestUri = pusher.signedUri("GET", "/apps/<appId>/channels", null); // no body on GET request
