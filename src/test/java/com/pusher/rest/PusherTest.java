@@ -22,6 +22,8 @@ import org.junit.Test;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.GsonBuilder;
 
+import com.pusher.rest.data.Event;
+
 /**
  * Tests which mock the HttpClient to check outgoing requests
  */
@@ -55,8 +57,18 @@ public class PusherTest {
 
     @SuppressWarnings("unused")
     private static class MyPojo {
-        private String aString = "value";
-        private int aNumber = 42;
+        private String aString;
+        private int aNumber;
+
+        public MyPojo() {
+            this.aString = "value";
+            this.aNumber = 42;
+        }
+
+        public MyPojo(final String aString, final int aNumber) {
+            this.aString = aString;
+            this.aNumber = aNumber;
+        }
     }
 
     @Test
@@ -93,6 +105,36 @@ public class PusherTest {
         }});
 
         p.trigger("my-channel", "event", "this is my string data");
+    }
+
+    @Test
+    public void batchEvents() throws IOException {
+        final List<Map<String, Object>> res = new ArrayList<Map<String, Object>>() {{
+          add(new HashMap<String, Object>() {{
+            put("channel", "my-channel");
+            put("name", "event-name");
+            put("data", "{\"aString\":\"value1\",\"aNumber\":42}");
+          }});
+
+          add(new HashMap<String, Object>() {{
+            put("channel", "my-channel");
+            put("name", "event-name");
+            put("data", "{\"aString\":\"value2\",\"aNumber\":43}");
+            put("socket_id", "22.33");
+          }});
+        }};
+
+        context.checking(new Expectations() {{
+            oneOf(httpClient).execute(
+                with(field("batch", res))
+            );
+        }});
+
+        List<Event> batch = new ArrayList<Event>();
+        batch.add(new Event("my-channel", "event-name", new MyPojo("value1", 42)));
+        batch.add(new Event("my-channel", "event-name", new MyPojo("value2", 43), "22.33"));
+
+        p.trigger(batch);
     }
 
     @Test
