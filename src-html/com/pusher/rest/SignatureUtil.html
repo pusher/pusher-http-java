@@ -77,10 +77,10 @@
 <span class="sourceLineNo">069</span>        }<a name="line.69"></a>
 <span class="sourceLineNo">070</span>        // If this doesn't exist, we're pretty much out of luck.<a name="line.70"></a>
 <span class="sourceLineNo">071</span>        catch (final NoSuchAlgorithmException e) {<a name="line.71"></a>
-<span class="sourceLineNo">072</span>            throw new RuntimeException("The Pusher REST client requires MD5 support", e);<a name="line.72"></a>
+<span class="sourceLineNo">072</span>            throw new RuntimeException("The Pusher HTTP client requires MD5 support", e);<a name="line.72"></a>
 <span class="sourceLineNo">073</span>        }<a name="line.73"></a>
 <span class="sourceLineNo">074</span>        catch (final UnsupportedEncodingException e) {<a name="line.74"></a>
-<span class="sourceLineNo">075</span>            throw new RuntimeException("The Pusher REST client needs UTF-8 support", e);<a name="line.75"></a>
+<span class="sourceLineNo">075</span>            throw new RuntimeException("The Pusher HTTP client needs UTF-8 support", e);<a name="line.75"></a>
 <span class="sourceLineNo">076</span>        }<a name="line.76"></a>
 <span class="sourceLineNo">077</span>    }<a name="line.77"></a>
 <span class="sourceLineNo">078</span><a name="line.78"></a>
@@ -98,10 +98,10 @@
 <span class="sourceLineNo">090</span>        }<a name="line.90"></a>
 <span class="sourceLineNo">091</span>        // If either of these doesn't exist, we're pretty much out of luck.<a name="line.91"></a>
 <span class="sourceLineNo">092</span>        catch (final NoSuchAlgorithmException e) {<a name="line.92"></a>
-<span class="sourceLineNo">093</span>            throw new RuntimeException("The Pusher REST client requires HmacSHA256 support", e);<a name="line.93"></a>
+<span class="sourceLineNo">093</span>            throw new RuntimeException("The Pusher HTTP client requires HmacSHA256 support", e);<a name="line.93"></a>
 <span class="sourceLineNo">094</span>        }<a name="line.94"></a>
 <span class="sourceLineNo">095</span>        catch (final UnsupportedEncodingException e) {<a name="line.95"></a>
-<span class="sourceLineNo">096</span>            throw new RuntimeException("The Pusher REST client needs UTF-8 support", e);<a name="line.96"></a>
+<span class="sourceLineNo">096</span>            throw new RuntimeException("The Pusher HTTP client needs UTF-8 support", e);<a name="line.96"></a>
 <span class="sourceLineNo">097</span>        }<a name="line.97"></a>
 <span class="sourceLineNo">098</span>    }<a name="line.98"></a>
 <span class="sourceLineNo">099</span><a name="line.99"></a>
