@@ -79,7 +79,7 @@ public class Pusher {
     private int requestTimeout = 4000; // milliseconds
 
     private CloseableHttpClient client;
-    private Gson dataMarshaller;
+    private PayloadSerialiser payloadSerialiser;
 
     /**
      * Construct an instance of the Pusher object through which you may interact with the Pusher API.
@@ -124,7 +124,7 @@ public class Pusher {
 
     private void configure() {
         configureHttpClient(defaultHttpClientBuilder());
-        this.dataMarshaller = new Gson();
+        setGsonSerialiser(new Gson());
     }
 
     /*
@@ -185,6 +185,9 @@ public class Pusher {
      * Set the Gson instance used to marshall Objects passed to {@link #trigger(List, String, Object)}
      * and friends.
      * <p>
+     * This is equivalent to calling {@link #setPayloadSerialiser(PayloadSerialiser) 
+     * setPayloadSerialiser(gson::toJson)}, and is provided for backwards-compatibility.
+     * <p>
      * The library marshalls the objects provided to JSON using the Gson library
      * (see https://code.google.com/p/google-gson/ for more details). By providing an instance
      * here, you may exert control over the marshalling, for example choosing how Java property
@@ -194,9 +197,24 @@ public class Pusher {
      * @param gson a GSON instance configured to your liking
      */
     public void setGsonSerialiser(final Gson gson) {
-        this.dataMarshaller = gson;
+        setPayloadSerialiser(new GsonPayloadSerialiser(gson));
     }
 
+    /**
+	 * Sets the payload serialiser used to marshall Objects passed to
+	 * {@link #trigger(List, String, Object)} and friends.
+	 * <p>
+	 * This allows you to override the default Gson based serialisation if Gson
+	 * absolutely unsuitable for your use case.
+	 * 
+	 * @param serialiser
+	 *            any object or function implementing the
+	 *            {@link PayloadSerialiser} interface.
+	 */
+    public void setPayloadSerialiser(final PayloadSerialiser serialiser) {
+        this.payloadSerialiser = serialiser;
+    }
+    
     /**
      * Returns an HttpClientBuilder with the settings used by default applied. You may apply
      * further configuration (for example an HTTP proxy), override existing configuration
@@ -274,7 +292,7 @@ public class Pusher {
      * @return a serialised event payload
      */
     protected String serialise(final Object data) {
-        return dataMarshaller.toJson(data);
+        return payloadSerialiser.serialise(data);
     }
 
     /*
