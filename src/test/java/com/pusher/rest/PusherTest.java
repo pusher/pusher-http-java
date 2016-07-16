@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -106,6 +107,22 @@ public class PusherTest {
 
         p.trigger("my-channel", "event", "this is my string data");
     }
+    
+    @Test
+	public void customSerialisationByAssociation() throws Exception {
+		p.setPayloadSerialiser(new PayloadSerialiser() {
+			@Override
+			public String serialise(Object o) {
+				return ((String)o).toUpperCase(Locale.ROOT);
+			}
+		});
+		
+	    context.checking(new Expectations() {{
+            oneOf(httpClient).execute(with(field("data", "THIS IS MY STRING DATA")));
+        }});
+
+        p.trigger("my-channel", "event", "this is my string data");
+	}
 
     @Test
     public void batchEvents() throws IOException {
