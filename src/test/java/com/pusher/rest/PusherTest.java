@@ -99,9 +99,15 @@ public class PusherTest {
                 return (String)data;
             }
         };
+        p.configureHttpClient(new HttpClientBuilder() {
+            @Override
+            public CloseableHttpClient build() {
+                return httpClient;
+            }
+        });
 
         context.checking(new Expectations() {{
-            oneOf(httpClient).execute(with(field("data", "this is my strong data")));
+            oneOf(httpClient).execute(with(field("data", "this is my string data")));
         }});
 
         p.trigger("my-channel", "event", "this is my string data");
