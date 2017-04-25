@@ -15,6 +15,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -447,8 +448,10 @@ public class Pusher {
                 .build();
         request.setConfig(config);
 
+        HttpResponse response = null;
+
         try {
-            final HttpResponse response = client.execute(request);
+            response = client.execute(request);
 
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             response.getEntity().writeTo(baos);
@@ -458,6 +461,9 @@ public class Pusher {
         }
         catch (final IOException e) {
             return Result.fromException(e);
+        } finally {
+            // Ensure the response is fully closed
+            HttpClientUtils.closeQuietly(response);
         }
     }
 
