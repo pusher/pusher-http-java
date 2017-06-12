@@ -46,8 +46,8 @@ Pusher pusher = new Pusher("http://<key>:<secret>@api.pusherapp.com:80/apps/<app
 Note: the API URL differs depending on the cluster your app was created in:
 
 ```
-http://<key>:<secret>@eu-api.pusherapp.com/apps/app_id
-http://<key>:<secret>@ap1-api.pusherapp.com/apps/app_id
+http://<key>:<secret>@api-mt1.pusher.com/apps/app_id
+http://<key>:<secret>@api-eu.pusher.com/apps/app_id
 ```
 
 This form sets the `key`, `secret`, `appId`, `host` and `secure` (based on the protocol in the URL) parameters all at once.
