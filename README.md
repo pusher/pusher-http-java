@@ -83,6 +83,17 @@ builder.setProxy(new HttpHost("proxy.example.com"));
 pusher.configureHttpClient(builder);
 ```
 
+```java
+HttpClientBuilder builder = Pusher.defaultHttpClientBuilder();
+HttpHost httpHost = new HttpHost("hostname", port);
+AuthScope authScope = new AuthScope("hostname", port);
+Credentials credentials = new UsernamePasswordCredentials("username", "passaword");         
+CredentialsProvider credsProvider = new BasicCredentialsProvider();
+credsProvider.setCredentials(authScope, credentials);           
+builder.setProxy(httpHost).setDefaultCredentialsProvider(credsProvider);
+pusher.configureHttpClient(builder);
+```
+
 ## Usage
 
 ### General info on responses
