@@ -141,7 +141,7 @@ Map<String, String> userInfo = new HashMap<>();
 userInfo.add("name", "Phil Leggetter");
 userInfo.add("twitterId", "@leggetter");
 
-String authBody = pusher.auth(socketId, channel, new PresenceUser(userId, userInfo));
+String authBody = pusher.authenticate(socketId, channel, new PresenceUser(userId, userInfo));
 ```
 
 For more information see: <http://pusher.com/docs/authenticating_users>
