@@ -138,8 +138,8 @@ Using presence channels is similar to private channels, but you can specify extr
 ```java
 String userId = "unique_user_id";
 Map<String, String> userInfo = new HashMap<>();
-userInfo.add("name", "Phil Leggetter");
-userInfo.add("twitterId", "@leggetter");
+userInfo.put("name", "Phil Leggetter");
+userInfo.put("twitterId", "@leggetter");
 
 String authBody = pusher.auth(socketId, channel, new PresenceUser(userId, userInfo));
 ```
