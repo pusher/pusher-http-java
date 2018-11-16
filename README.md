@@ -41,7 +41,7 @@ This form sets the `key`, `secret`, `appId`, `host` and `secure` (based on the p
 
 ### Additional options
 
-There are additional options wich can be set on the `Pusher` object once constructed:
+There are additional options which can be set on the `Pusher` object once constructed:
 
 #### Cluster or host
 
