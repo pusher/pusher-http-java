@@ -40,7 +40,7 @@ public class Crypto {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             return digest.digest((channelName+ENCRYPTION_KEY).getBytes(StandardCharsets.UTF_8));
         } catch (NoSuchAlgorithmException e) {
-            throw new UnsupportedOperationException("Your platform does not support SHA-256, which is required for end to end encryption.");
+            throw new RuntimeException("Your platform does not support SHA-256, which is required for end to end encryption.");
         }
     }
     public static boolean isEncryptedChannel(String channel) {
