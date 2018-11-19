@@ -73,6 +73,20 @@ public final class Prerequisites {
         matchesRegex("channel", VALID_CHANNEL, channel);
     }
 
+    public static void isValidEncryptionMasterKey(final String encryptionMasterKey) {
+        if (encryptionMasterKey.length() != 32) {
+            throw new IllegalArgumentException("Supplied Encryption Master Key was not 32 characters long");
+        }
+    }
+
+    public static void eitherOneorNoEncryptedChannels(List<String> channels) {
+        for (String channel : channels) {
+            if(channel.startsWith("private-encrypted-") && channels.size() > 1) {
+                throw new IllegalArgumentException("Batch events containing private-encrypted channels are not supported.");
+            }
+        }
+    }
+
     public static void isValidSocketId(final String socketId) {
         if (socketId != null) {
             matchesRegex("socket_id", VALID_SOCKET_ID, socketId);

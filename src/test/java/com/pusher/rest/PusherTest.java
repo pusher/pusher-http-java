@@ -72,6 +72,19 @@ public class PusherTest {
     }
 
     @Test
+    public void initialisePusherValidEncryptionMasterKey() {
+        String EncryptionMasterKey = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        Pusher p = new Pusher(APP_ID, KEY, SECRET, EncryptionMasterKey);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void initialisePusherInvalidEncryptionMasterKey() {
+        String EncryptionMasterKey = "notlongenough";
+        Pusher p = new Pusher(APP_ID, KEY, SECRET, EncryptionMasterKey);
+
+    }
+
+    @Test
     public void serialisePojo() throws IOException {
         context.checking(new Expectations() {{
             oneOf(httpClient).execute(with(field("data", "{\"aString\":\"value\",\"aNumber\":42}")));

@@ -3,13 +3,12 @@ package com.pusher.rest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.pusher.rest.util.Crypto;
+import com.pusher.rest.util.EncryptedPayload;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
@@ -73,13 +72,39 @@ public class Pusher {
     private final String appId;
     private final String key;
     private final String secret;
+    private final String encryptionMasterKey;
 
     private String host = "api.pusherapp.com";
     private String scheme = "http";
     private int requestTimeout = 4000; // milliseconds
 
     private CloseableHttpClient client;
+    private Crypto pusherCrypto;
     private Gson dataMarshaller;
+
+
+    /**
+     * Construct an instance of the Pusher object through which you may interact with the Pusher API.
+     * <p>
+     * The parameters to use are found on your dashboard at https://app.pusher.com and are specific per App.
+     * <p>
+     * @param appId The ID of the App you will to interact with.
+     * @param key The App Key, the same key you give to websocket clients to identify your app when they connect to Pusher.
+     * @param secret The App Secret. Used to sign requests to the API, this should be treated as sensitive and not distributed.
+     */
+    public Pusher(final String appId, final String key, final String secret, final String encryptionMasterKey) {
+        Prerequisites.nonEmpty("appId", appId);
+        Prerequisites.nonEmpty("key", key);
+        Prerequisites.nonEmpty("secret", secret);
+        Prerequisites.isValidSha256Key("secret", secret);
+        Prerequisites.isValidEncryptionMasterKey(encryptionMasterKey);
+        this.appId = appId;
+        this.key = key;
+        this.secret = secret;
+        this.encryptionMasterKey = encryptionMasterKey;
+        configure();
+        pusherCrypto = new Crypto(encryptionMasterKey, dataMarshaller);
+    }
 
     /**
      * Construct an instance of the Pusher object through which you may interact with the Pusher API.
@@ -99,7 +124,7 @@ public class Pusher {
         this.appId = appId;
         this.key = key;
         this.secret = secret;
-
+        this.encryptionMasterKey = null;
         configure();
     }
 
@@ -113,6 +138,7 @@ public class Pusher {
             this.secret = m.group(3);
             this.host = m.group(4);
             this.appId = m.group(5);
+            this.encryptionMasterKey = null;
         }
         else {
             throw new IllegalArgumentException("URL '" + url + "' does not match pattern '<scheme>://<key>:<secret>@<host>[:<port>]/apps/<appId>'");
@@ -341,9 +367,14 @@ public class Pusher {
         Prerequisites.noNullMembers("channels", channels);
         Prerequisites.areValidChannels(channels);
         Prerequisites.isValidSocketId(socketId);
-
-        final String body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
-
+        Prerequisites.eitherOneorNoEncryptedChannels(channels);
+        String body = "";
+        if(Crypto.isEncryptedChannel(channels.get(0))) {
+            EncryptedPayload ep = pusherCrypto.encrypt(channels.get(0), data);
+            body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(ep), socketId));
+        } else {
+            body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
+        }
         return post("/events", body);
     }
 
@@ -517,7 +548,11 @@ public class Pusher {
         }
 
         final String signature = SignatureUtil.sign(socketId + ":" + channel, secret);
-        return BODY_SERIALISER.toJson(new AuthData(key, signature));
+        String sharedSecret = null;
+        if(Crypto.isEncryptedChannel(channel)) {
+            sharedSecret = Base64.getEncoder().encodeToString(pusherCrypto.generateSharedSecret(channel));
+        }
+        return BODY_SERIALISER.toJson(new AuthData(key, signature, sharedSecret));
     }
 
     /**
@@ -537,16 +572,16 @@ public class Pusher {
         Prerequisites.isValidChannel(channel);
         Prerequisites.isValidSocketId(socketId);
 
-        if (channel.startsWith("private-")) {
+        if (channel.startsWith("private-") || channel.startsWith("private-encrypted-")) {
             throw new IllegalArgumentException("This method is for presence channels, use authenticate(String, String) to authenticate for a private channel.");
         }
         if (!channel.startsWith("presence-")) {
-            throw new IllegalArgumentException("Authentication is only applicable to private and presence channels");
+            throw new IllegalArgumentException("Authentication is only applicable to private, private-encrypted, and presence channels");
         }
 
         final String channelData = BODY_SERIALISER.toJson(user);
         final String signature = SignatureUtil.sign(socketId + ":" + channel + ":" + channelData, secret);
-        return BODY_SERIALISER.toJson(new AuthData(key, signature, channelData));
+        return BODY_SERIALISER.toJson(new AuthData(key, signature, channelData,null));
     }
 
     /*
