@@ -8,15 +8,17 @@ import com.pusher.rest.util.EncryptedPayload;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Base64;
+import static org.junit.Assume.assumeTrue;
 
 public class CryptoTest {
     private static final Gson BODY_SERIALISER = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
-
+    private final static char[] hexArray = "0123456789abcdef".toCharArray();
     @Test
     public void testGenerateSharedSecret() {
+
+        assumeTrue(Crypto.cryptoAvailable());
         Crypto pc = new Crypto("This is a string that is 32 chars", BODY_SERIALISER);
         byte[] sharedSecret = pc.generateSharedSecret("private-encrypted-bla");
         String sharedSecretB64 = bytesToHex(sharedSecret);
@@ -25,6 +27,7 @@ public class CryptoTest {
     }
     @Test
     public void testEncrypt() {
+        assumeTrue( Crypto.cryptoAvailable());
         String channelName = "private-encrypted-bla";
         String data = "Hello! Hello! Hello!";
         String encryptionKey = "This is a string that is 32 chars";
@@ -34,8 +37,6 @@ public class CryptoTest {
         Assert.assertNotNull(ep.getNonce());
     }
 /* Helper method to encode bytes into hex, useful for testing that shared secret generator is making secrets correctly. */
-    private final static char[] hexArray = "0123456789abcdef".toCharArray();
-
     public static String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++) {

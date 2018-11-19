@@ -1,6 +1,7 @@
 package com.pusher.rest;
 
 import static com.pusher.rest.util.Matchers.*;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.pusher.rest.util.Crypto;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.jmock.Expectations;
@@ -73,12 +75,14 @@ public class PusherTest {
 
     @Test
     public void initialisePusherValidEncryptionMasterKey() {
+        assumeTrue( Crypto.cryptoAvailable());
         String EncryptionMasterKey = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
         Pusher p = new Pusher(APP_ID, KEY, SECRET, EncryptionMasterKey);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void initialisePusherInvalidEncryptionMasterKey() {
+        assumeTrue( Crypto.cryptoAvailable());
         String EncryptionMasterKey = "notlongenough";
         Pusher p = new Pusher(APP_ID, KEY, SECRET, EncryptionMasterKey);
 

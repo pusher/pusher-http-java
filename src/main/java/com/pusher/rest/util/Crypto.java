@@ -16,14 +16,12 @@ public class Crypto {
     private final Gson BODY_SERIALISER;
     private final String ENCRYPTION_KEY;
 
-    public Crypto(String encryptionKey, Gson serialiser) throws UnsupportedOperationException {
+    public Crypto(String encryptionKey, Gson serialiser) throws RuntimeException {
         this.BODY_SERIALISER = serialiser;
         this.ENCRYPTION_KEY = encryptionKey;
-    }
-
-    public byte[] generateNonce() {
-        Random r = new Random();
-        return r.randomBytes(24);
+        if(!cryptoAvailable()) {
+            throw new RuntimeException("The Pusher client requires Libsodium for End to End Encryption");
+        }
     }
 
     public EncryptedPayload encrypt(String channelName, Object data) {
@@ -47,5 +45,17 @@ public class Crypto {
     }
     public static boolean isEncryptedChannel(String channel) {
         return channel.startsWith(PRIVATE_ENCRYPTED_CHANNEL_PREFIX);
+    }
+    public static boolean cryptoAvailable() {
+        try {
+            generateNonce();
+            return true;
+        } catch (UnsatisfiedLinkError e) {
+            return false;
+        }
+    }
+    public static byte[] generateNonce() throws UnsatisfiedLinkError {
+        Random r = new Random();
+        return r.randomBytes(24);
     }
 }
