@@ -37,7 +37,6 @@ public class PusherHttpTest {
     public void setup() throws Exception {
         server = new LocalTestServer(null, null);
         server.register("/*", new HttpRequestHandler() {
-            @Override
             public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
                 response.setStatusCode(responseStatus);
                 if (responseBody != null) {

@@ -20,9 +20,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import com.pusher.rest.data.Event;
+import com.pusher.rest.marshaller.DataMarshaller;
 
 /**
  * Tests which mock the HttpClient to check outgoing requests
@@ -82,7 +84,12 @@ public class PusherTest {
 
     @Test
     public void customSerialisationGson() throws Exception {
-        p.setGsonSerialiser(new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create());
+        p.setDataMarshaller(new DataMarshaller() {
+            private Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create();
+            public String marshall(final Object data) {
+                return gson.toJson(data);
+            }
+        });
 
         context.checking(new Expectations() {{
             oneOf(httpClient).execute(with(field("data", "{\"a-string\":\"value\",\"a-number\":42}")));

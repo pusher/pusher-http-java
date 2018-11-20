@@ -33,6 +33,8 @@ import com.pusher.rest.data.PresenceUser;
 import com.pusher.rest.data.Result;
 import com.pusher.rest.data.TriggerData;
 import com.pusher.rest.data.Validity;
+import com.pusher.rest.marshaller.DataMarshaller;
+import com.pusher.rest.marshaller.DefaultDataMarshaller;
 import com.pusher.rest.util.Prerequisites;
 
 /**
@@ -79,7 +81,7 @@ public class Pusher {
     private int requestTimeout = 4000; // milliseconds
 
     private CloseableHttpClient client;
-    private Gson dataMarshaller;
+    private DataMarshaller dataMarshaller;
 
     /**
      * Construct an instance of the Pusher object through which you may interact with the Pusher API.
@@ -124,7 +126,7 @@ public class Pusher {
 
     private void configure() {
         configureHttpClient(defaultHttpClientBuilder());
-        this.dataMarshaller = new Gson();
+        this.dataMarshaller = new DefaultDataMarshaller();
     }
 
     /*
@@ -182,19 +184,19 @@ public class Pusher {
     }
 
     /**
-     * Set the Gson instance used to marshall Objects passed to {@link #trigger(List, String, Object)}
+     * Set the marshaller used to serialize Objects passed to {@link #trigger(List, String, Object)}
      * and friends.
      * <p>
-     * The library marshalls the objects provided to JSON using the Gson library
+     * By default, the library marshalls the objects provided to JSON using the Gson library
      * (see https://code.google.com/p/google-gson/ for more details). By providing an instance
      * here, you may exert control over the marshalling, for example choosing how Java property
      * names are mapped on to the field names in the JSON representation, allowing you to match
      * the expected scheme on the client side.
      *
-     * @param gson a GSON instance configured to your liking
+     * @param marshaller a DataMarshaller instance configured to your liking
      */
-    public void setGsonSerialiser(final Gson gson) {
-        this.dataMarshaller = gson;
+    public void setDataMarshaller(final DataMarshaller marshaller) {
+        this.dataMarshaller = marshaller;
     }
 
     /**
@@ -274,7 +276,7 @@ public class Pusher {
      * @return a serialised event payload
      */
     protected String serialise(final Object data) {
-        return dataMarshaller.toJson(data);
+        return dataMarshaller.marshall(data);
     }
 
     /*
@@ -285,7 +287,7 @@ public class Pusher {
      * Publish a message to a single channel.
      * <p>
      * The message data should be a POJO, which will be serialised to JSON for submission.
-     * Use {@link #setGsonSerialiser(Gson)} to control the serialisation
+     * Use {@link #setDataMarshaller(DataMarshaller)} to control the serialisation
      * <p>
      * Note that if you do not wish to create classes specifically for the purpose of specifying
      * the message payload, use Map&lt;String, Object&gt;. These maps will nest just fine.
