@@ -1,9 +1,38 @@
----
-# use faster container
-sudo: false
 language: java
-jdk:
-  - oraclejdk8
-  - oraclejdk7
-  - openjdk6
-  - openjdk7
+dist: xenial
+matrix:
+  include:
+  # Test Java version without installing Libsodium to check tests still pass
+  - jdk:
+      openjdk-8
+      openjdk-9
+      openjdk-10
+      openjdk-11
+    addons:
+      apt:
+        packages:
+          - libsodium-dev
+  - jdk:
+      openjdk-8
+      openjdk-9
+      openjdk-10
+      openjdk-11
+
+
+before_install:
+- unset _JAVA_OPTIONS
+
+install:
+- echo "Installing deps"
+  mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+
+before_script:
+- echo JAVA_HOME = ${JAVA_HOME}
+- echo PATH = ${PATH}
+
+script:
+- mvn test
+
+after_script:
+- ls ${JAVA_HOME}
+- cat "${JAVA_HOME}/release"

@@ -18,14 +18,16 @@ public class CryptoTest {
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
 
-    final Crypto pc = new Crypto("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", BODY_SERIALISER);
-
+    private Crypto pc = null;
     @Before
     public void initialize() {
-        assumeTrue(Crypto.cryptoAvailable());
+        if(Crypto.cryptoAvailable()) {
+             pc = new Crypto("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", BODY_SERIALISER);
+        }
     }
     @Test
     public void testGenerateSharedSecret() {
+        assumeTrue(Crypto.cryptoAvailable());
         // Check that the secret generation is generating consistent secrets
         byte[] sharedSecret = pc.generateSharedSecret("private-encrypted-channel-a");
         String sharedSecretB64 = Base64.getEncoder().encodeToString(sharedSecret);
@@ -49,6 +51,7 @@ public class CryptoTest {
 
     @Test
     public void testIsEncryptedChannel() {
+        assumeTrue(Crypto.cryptoAvailable());
         Assert.assertTrue(Crypto.isEncryptedChannel("private-encrypted-test"));
         Assert.assertFalse(Crypto.isEncryptedChannel("private-encrypted"));
         Assert.assertFalse(Crypto.isEncryptedChannel("test-private-encrypted"));
@@ -56,6 +59,7 @@ public class CryptoTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testEncryptPayloadNoChannel() {
+        assumeTrue(Crypto.cryptoAvailable());
         String channel = "";
         String payload = "now that's what I call a payload!";
         pc.encrypt(channel, payload);
@@ -63,6 +67,7 @@ public class CryptoTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testEncryptPayloadPublicChannel() {
+        assumeTrue(Crypto.cryptoAvailable());
         String channel = "public-static-void-main";
         String payload = "now that's what I call a payload!";
         pc.encrypt(channel, payload);
@@ -70,6 +75,7 @@ public class CryptoTest {
 
     @Test
     public void testEncrypt() {
+        assumeTrue(Crypto.cryptoAvailable());
         String channelName = "private-encrypted-bla";
         String data = "Hello! Hello! Hello!";
         String encryptionKey = "This is a string that is 32 chars";
