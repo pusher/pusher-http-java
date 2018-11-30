@@ -6,7 +6,10 @@ import com.google.gson.GsonBuilder;
 import com.pusher.rest.util.Crypto;
 import com.pusher.rest.util.EncryptedPayload;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Base64;
 
 import static org.junit.Assume.assumeTrue;
 
@@ -14,20 +17,59 @@ public class CryptoTest {
     private static final Gson BODY_SERIALISER = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
-    private final static char[] hexArray = "0123456789abcdef".toCharArray();
-    @Test
-    public void testGenerateSharedSecret() {
 
+    final Crypto pc = new Crypto("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", BODY_SERIALISER);
+
+    @Before
+    public void initialize() {
         assumeTrue(Crypto.cryptoAvailable());
-        Crypto pc = new Crypto("This is a string that is 32 chars", BODY_SERIALISER);
-        byte[] sharedSecret = pc.generateSharedSecret("private-encrypted-bla");
-        String sharedSecretB64 = bytesToHex(sharedSecret);
-        String expected = "004831f99d2a4e86723e893caded3a2897deeddbed9514fe9497dcddc52bd50b";
-        Assert.assertEquals(expected, sharedSecretB64);
     }
     @Test
+    public void testGenerateSharedSecret() {
+        // Check that the secret generation is generating consistent secrets
+        byte[] sharedSecret = pc.generateSharedSecret("private-encrypted-channel-a");
+        String sharedSecretB64 = Base64.getEncoder().encodeToString(sharedSecret);
+        String expected = "Rp+wpkNpL89qhqco1JkIG31AVXyU8PUVJBr1B2MvdoA=";
+        Assert.assertEquals(expected, sharedSecretB64);
+
+        // Check that the secret generation is using the channel as a part of the generation
+        byte[] sharedSecret2 = pc.generateSharedSecret("private-encrypted-channel-b");
+        if(sharedSecret == sharedSecret2) {
+            Assert.fail();
+        }
+        Crypto pc2 = new Crypto("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", BODY_SERIALISER);
+        byte[] sharedSecret3 = pc2.generateSharedSecret("private-encrypted-channel-a");
+
+
+        String sharedSecret3B64 = Base64.getEncoder().encodeToString(sharedSecret3);
+        if(sharedSecretB64==sharedSecret3B64) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testIsEncryptedChannel() {
+        Assert.assertTrue(Crypto.isEncryptedChannel("private-encrypted-test"));
+        Assert.assertFalse(Crypto.isEncryptedChannel("private-encrypted"));
+        Assert.assertFalse(Crypto.isEncryptedChannel("test-private-encrypted"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testEncryptPayloadNoChannel() {
+        String channel = "";
+        String payload = "now that's what I call a payload!";
+        pc.encrypt(channel, payload);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testEncryptPayloadPublicChannel() {
+        String channel = "public-static-void-main";
+        String payload = "now that's what I call a payload!";
+        pc.encrypt(channel, payload);
+    }
+
+    @Test
     public void testEncrypt() {
-        assumeTrue( Crypto.cryptoAvailable());
         String channelName = "private-encrypted-bla";
         String data = "Hello! Hello! Hello!";
         String encryptionKey = "This is a string that is 32 chars";
@@ -35,16 +77,6 @@ public class CryptoTest {
         EncryptedPayload ep = pc.encrypt(channelName, data);
         Assert.assertNotNull(ep.getCiphertext());
         Assert.assertNotNull(ep.getNonce());
-    }
-/* Helper method to encode bytes into hex, useful for testing that shared secret generator is making secrets correctly. */
-    public static String bytesToHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
     }
 
 }
