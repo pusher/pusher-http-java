@@ -3,6 +3,7 @@ package com.pusher.rest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -83,28 +84,6 @@ public class Pusher {
     private Gson dataMarshaller;
 
 
-    /**
-     * Construct an instance of the Pusher object through which you may interact with the Pusher API.
-     * <p>
-     * The parameters to use are found on your dashboard at https://app.pusher.com and are specific per App.
-     * <p>
-     * @param appId The ID of the App you will to interact with.
-     * @param key The App Key, the same key you give to websocket clients to identify your app when they connect to Pusher.
-     * @param secret The App Secret. Used to sign requests to the API, this should be treated as sensitive and not distributed.
-     */
-    public Pusher(final String appId, final String key, final String secret, final String encryptionMasterKey) {
-        Prerequisites.nonEmpty("appId", appId);
-        Prerequisites.nonEmpty("key", key);
-        Prerequisites.nonEmpty("secret", secret);
-        Prerequisites.isValidSha256Key("secret", secret);
-        Prerequisites.isValidEncryptionMasterKey(encryptionMasterKey);
-        this.appId = appId;
-        this.key = key;
-        this.secret = secret;
-        this.encryptionMasterKey = encryptionMasterKey;
-        configure();
-        pusherCrypto = new Crypto(encryptionMasterKey, dataMarshaller);
-    }
 
     /**
      * Construct an instance of the Pusher object through which you may interact with the Pusher API.
@@ -126,6 +105,32 @@ public class Pusher {
         this.secret = secret;
         this.encryptionMasterKey = null;
         configure();
+    }
+
+    /**
+     * Construct an instance of the Pusher object with End to End Encryption through which you may interact with the Pusher API.
+     * <p>
+     * The parameters to use are found on your dashboard at https://app.pusher.com and are specific per App.
+     * <p>
+     * @param appId The ID of the App you will to interact with.
+     * @param key The App Key, the same key you give to websocket clients to identify your app when they connect to Pusher.
+     * @param secret The App Secret. Used to sign requests to the API, this should be treated as sensitive and not distributed.
+     * @param encryptionMasterKey 32 character long secret you define for end to end encryption
+     *                            This should be treated as sensitive and not distributed.
+     *                            See https://pusher.com/docs/client_api_guide/client_encrypted_channels for more info
+     */
+    public Pusher(final String appId, final String key, final String secret, final String encryptionMasterKey) {
+        Prerequisites.nonEmpty("appId", appId);
+        Prerequisites.nonEmpty("key", key);
+        Prerequisites.nonEmpty("secret", secret);
+        Prerequisites.isValidSha256Key("secret", secret);
+        Prerequisites.isValidEncryptionMasterKey(encryptionMasterKey);
+        this.appId = appId;
+        this.key = key;
+        this.secret = secret;
+        this.encryptionMasterKey = encryptionMasterKey;
+        configure();
+        pusherCrypto = new Crypto(encryptionMasterKey, dataMarshaller);
     }
 
     public Pusher(final String url) {
@@ -368,10 +373,10 @@ public class Pusher {
         Prerequisites.areValidChannels(channels);
         Prerequisites.isValidSocketId(socketId);
         Prerequisites.eitherOneorNoEncryptedChannels(channels);
-        String body = "";
+        String body;
         if(Crypto.isEncryptedChannel(channels.get(0))) {
-            EncryptedPayload ep = pusherCrypto.encrypt(channels.get(0), data);
-            body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(ep), socketId));
+            EncryptedPayload dataEncrypted = pusherCrypto.encrypt(channels.get(0), data);
+            body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(dataEncrypted), socketId));
         } else {
             body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
         }
@@ -416,7 +421,7 @@ public class Pusher {
      * @return a {@link Result} object encapsulating the success state and response to the request
      */
     public Result get(final String path) {
-        return get(path, Collections.<String, String>emptyMap());
+        return get(path, Collections.emptyMap());
     }
 
     /**
@@ -459,7 +464,7 @@ public class Pusher {
      */
     public Result post(final String path, final String body) {
         final String fullPath = "/apps/" + appId + path;
-        final URI uri = SignatureUtil.uri("POST", scheme, host, fullPath, body, key, secret, Collections.<String, String>emptyMap());
+        final URI uri = SignatureUtil.uri("POST", scheme, host, fullPath, body, key, secret, Collections.emptyMap());
 
         final StringEntity bodyEntity = new StringEntity(body, "UTF-8");
         bodyEntity.setContentType("application/json");
@@ -483,7 +488,7 @@ public class Pusher {
 
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             response.getEntity().writeTo(baos);
-            final String responseBody = new String(baos.toByteArray(), "UTF-8");
+            final String responseBody = new String(baos.toByteArray(), StandardCharsets.UTF_8);
 
             return Result.fromHttpCode(response.getStatusLine().getStatusCode(), responseBody);
         }
@@ -502,7 +507,7 @@ public class Pusher {
      * @return a URI object which includes the necessary query params for request authentication
      */
     public URI signedUri(final String method, final String path, final String body) {
-        return signedUri(method, path, body, Collections.<String, String>emptyMap());
+        return signedUri(method, path, body, Collections.emptyMap());
     }
 
     /**

@@ -44,7 +44,7 @@ public class CryptoTest {
 
 
         String sharedSecret3B64 = Base64.getEncoder().encodeToString(sharedSecret3);
-        if(sharedSecretB64==sharedSecret3B64) {
+        if(sharedSecretB64.equals(sharedSecret3B64)) {
             Assert.fail();
         }
     }

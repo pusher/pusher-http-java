@@ -75,16 +75,16 @@ public class PusherTest {
 
     @Test
     public void initialisePusherValidEncryptionMasterKey() {
-        assumeTrue( Crypto.cryptoAvailable());
+        assumeTrue(Crypto.cryptoAvailable());
         String EncryptionMasterKey = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-        Pusher p = new Pusher(APP_ID, KEY, SECRET, EncryptionMasterKey);
+        new Pusher(APP_ID, KEY, SECRET, EncryptionMasterKey);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void initialisePusherInvalidEncryptionMasterKey() {
-        assumeTrue( Crypto.cryptoAvailable());
+        assumeTrue(Crypto.cryptoAvailable());
         String EncryptionMasterKey = "notlongenough";
-        Pusher p = new Pusher(APP_ID, KEY, SECRET, EncryptionMasterKey);
+        new Pusher(APP_ID, KEY, SECRET, EncryptionMasterKey);
 
     }
 
@@ -172,7 +172,7 @@ public class PusherTest {
         List<String> level3 = new ArrayList<String>();
         level3.add("v4");
         level3.add("v5");
-        level2.put("k4", level3);;
+        level2.put("k4", level3);
         data.put("k2", level2);
 
         final String expectedData = "{\"k1\":\"v1\",\"k2\":{\"k3\":\"v3\",\"k4\":[\"v4\",\"v5\"]}}";
@@ -185,7 +185,7 @@ public class PusherTest {
 
     @Test
     public void channelList() throws Exception {
-        final List<String> channels = Arrays.asList(new String[] { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten" });
+        final List<String> channels = Arrays.asList("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten");
 
         context.checking(new Expectations() {{
             oneOf(httpClient).execute(with(field("channels", channels)));
@@ -196,7 +196,7 @@ public class PusherTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void channelListLimitOverLimit() {
-        final List<String> channels = Arrays.asList(new String[] { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven" });
+        final List<String> channels = Arrays.asList("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven");
 
         p.trigger(channels, "event", Collections.singletonMap("name", "value"));
     }
