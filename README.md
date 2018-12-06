@@ -29,6 +29,12 @@ The minimum configuration required to use the `Pusher` object are the three cons
 Pusher pusher = new Pusher(appId, apiKey, apiSecret);
 ```
 
+If you wish to use [End to End Encrypted Channels](#end-to-end-encryption-beta), you also need to specify the Encryption Master Key, a 32 character long key you should keep secret.
+
+```java
+Pusher pusher = new Pusher(appId, apiKey, apiSecret, encryptionMasterKey);
+```
+
 ### From URL
 
 The basic parameters may also be set from a URL, as provided (for example) as an environment variable when running on Heroku with the Pusher addon:
@@ -41,7 +47,7 @@ This form sets the `key`, `secret`, `appId`, `host` and `secure` (based on the p
 
 ### Additional options
 
-There are additional options wich can be set on the `Pusher` object once constructed:
+There are additional options which can be set on the `Pusher` object once constructed:
 
 #### Cluster or host
 
@@ -146,6 +152,33 @@ String authBody = pusher.authenticate(socketId, channel, new PresenceUser(userId
 
 For more information see: <http://pusher.com/docs/authenticating_users>
 
+### End-to-end encryption [BETA]
+
+This library supports end-to-end encryption of your private channels. This means that only you and your connected clients will be able to read your messages. Pusher cannot decrypt them. You can enable this feature by following these steps:
+
+1. You should first set up Private channels. This involves [creating an authentication endpoint on your server](https://pusher.com/docs/authenticating_users).
+
+2. Next, Specify your 32 character `encryption_master_key`. This is secret and you should never share this with anyone. Not even Pusher.
+
+```java
+var pusher = Pusher(
+    "app_id",
+    "key",
+    "secret",
+    "encryption_master_key"
+    );
+pusher.setCluster("your-cluster");
+   ```
+
+3. Channels where you wish to use end-to-end encryption should be prefixed with `private-encrypted-`.
+
+4. Subscribe to these channels in your client, and you're done! You can verify it is working by checking out the debug console on the [https://dashboard.pusher.com/](dashboard) and seeing the scrambled ciphertext.
+
+**Important note: This will __not__ encrypt messages on channels that are not prefixed by `private-encrypted-`.**
+
+**Limitation**: you cannot trigger a single event on multiple channels in a call to `trigger`, e.g.
+
+Rationale: the methods in this library map directly to individual Channels HTTP API requests. If we allowed triggering a single event on multiple channels (some encrypted, some unencrypted), then it would require two API requests: one where the event is encrypted to the encrypted channels, and one where the event is unencrypted for unencrypted channels.
 ### Application state
 
 It's possible to query the state of the application using the `get` method.
