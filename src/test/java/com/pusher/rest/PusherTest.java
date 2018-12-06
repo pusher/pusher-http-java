@@ -1,16 +1,8 @@
 package com.pusher.rest;
 
-import static com.pusher.rest.util.Matchers.*;
-import static org.junit.Assume.assumeTrue;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.GsonBuilder;
+import com.pusher.rest.data.Event;
 import com.pusher.rest.util.Crypto;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -21,10 +13,12 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.GsonBuilder;
+import java.io.IOException;
+import java.util.*;
 
-import com.pusher.rest.data.Event;
+import static com.pusher.rest.util.Matchers.field;
+import static com.pusher.rest.util.Matchers.path;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * Tests which mock the HttpClient to check outgoing requests
