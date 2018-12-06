@@ -1,15 +1,12 @@
 package com.pusher.rest;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.pusher.rest.data.*;
 import com.pusher.rest.util.Crypto;
 import com.pusher.rest.util.EncryptedPayload;
+import com.pusher.rest.util.Prerequisites;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
@@ -22,19 +19,13 @@ import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import com.pusher.rest.data.AuthData;
-import com.pusher.rest.data.Event;
-import com.pusher.rest.data.EventBatch;
-import com.pusher.rest.data.PresenceUser;
-import com.pusher.rest.data.Result;
-import com.pusher.rest.data.TriggerData;
-import com.pusher.rest.data.Validity;
-import com.pusher.rest.util.Prerequisites;
-
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 /**
  * A library for interacting with the Pusher HTTP API.
  * <p>
@@ -73,7 +64,6 @@ public class Pusher {
     private final String appId;
     private final String key;
     private final String secret;
-    private final String encryptionMasterKey;
 
     private String host = "api.pusherapp.com";
     private String scheme = "http";
@@ -103,7 +93,6 @@ public class Pusher {
         this.appId = appId;
         this.key = key;
         this.secret = secret;
-        this.encryptionMasterKey = null;
         configure();
     }
 
@@ -128,7 +117,6 @@ public class Pusher {
         this.appId = appId;
         this.key = key;
         this.secret = secret;
-        this.encryptionMasterKey = encryptionMasterKey;
         configure();
         pusherCrypto = new Crypto(encryptionMasterKey, dataMarshaller);
     }
@@ -143,7 +131,6 @@ public class Pusher {
             this.secret = m.group(3);
             this.host = m.group(4);
             this.appId = m.group(5);
-            this.encryptionMasterKey = null;
         }
         else {
             throw new IllegalArgumentException("URL '" + url + "' does not match pattern '<scheme>://<key>:<secret>@<host>[:<port>]/apps/<appId>'");
