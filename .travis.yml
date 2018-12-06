@@ -32,7 +32,3 @@ before_script:
 
 script:
 - mvn test
-
-after_script:
-- ls ${JAVA_HOME}
-- cat "${JAVA_HOME}/release"
