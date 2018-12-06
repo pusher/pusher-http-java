@@ -32,3 +32,6 @@ before_script:
 
 script:
 - mvn test
+
+after_script:
+- echo "Finished build attempt"
