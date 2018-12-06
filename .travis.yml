@@ -34,4 +34,5 @@ script:
 - mvn test
 
 after_script:
-- echo "Finished build attempt"
+- ls ${JAVA_HOME}
+- cat "${JAVA_HOME}/release"
