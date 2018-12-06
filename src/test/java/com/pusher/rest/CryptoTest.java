@@ -39,6 +39,8 @@ public class CryptoTest {
         if(sharedSecret == sharedSecret2) {
             Assert.fail();
         }
+
+        // Check that the secret generation is using the encryption master key as a part of the generation
         Crypto pc2 = new Crypto("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", BODY_SERIALISER);
         byte[] sharedSecret3 = pc2.generateSharedSecret("private-encrypted-channel-a");
 
