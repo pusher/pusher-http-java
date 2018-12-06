@@ -85,15 +85,7 @@ public class Pusher {
      * @param secret The App Secret. Used to sign requests to the API, this should be treated as sensitive and not distributed.
      */
     public Pusher(final String appId, final String key, final String secret) {
-        Prerequisites.nonEmpty("appId", appId);
-        Prerequisites.nonEmpty("key", key);
-        Prerequisites.nonEmpty("secret", secret);
-        Prerequisites.isValidSha256Key("secret", secret);
-
-        this.appId = appId;
-        this.key = key;
-        this.secret = secret;
-        configure();
+        this(appId, key, secret, null);
     }
 
     /**
@@ -113,12 +105,14 @@ public class Pusher {
         Prerequisites.nonEmpty("key", key);
         Prerequisites.nonEmpty("secret", secret);
         Prerequisites.isValidSha256Key("secret", secret);
-        Prerequisites.isValidEncryptionMasterKey(encryptionMasterKey);
         this.appId = appId;
         this.key = key;
         this.secret = secret;
         configure();
-        pusherCrypto = new Crypto(encryptionMasterKey, dataMarshaller);
+        if(encryptionMasterKey != null) {
+            Prerequisites.isValidEncryptionMasterKey(encryptionMasterKey);
+            pusherCrypto = new Crypto(encryptionMasterKey, dataMarshaller);
+        }
     }
 
     public Pusher(final String url) {
