@@ -373,13 +373,21 @@ public class Pusher {
      * @return a {@link Result} object encapsulating the success state and response to the request
      */
     public Result trigger(final List<Event> batch) {
-        final List<Event> eventsWithSerialisedBodies = new ArrayList<Event>(batch.size());
+        final List<Event> eventsWithSerialisedBodies = new ArrayList<>(batch.size());
         for (final Event e : batch) {
+            String payload;
+            // Encrypt events sent to channels that are encrypted
+            if(Crypto.isEncryptedChannel(e.getChannel())) {
+                EncryptedPayload ep = pusherCrypto.encrypt(e.getChannel(), serialise(e.getData()));
+                payload = serialise(ep);
+            } else {
+                payload = serialise(e.getData());
+            }
             eventsWithSerialisedBodies.add(
                 new Event(
                     e.getChannel(),
                     e.getName(),
-                    serialise(e.getData()),
+                    payload,
                     e.getSocketId()
                 )
             );
