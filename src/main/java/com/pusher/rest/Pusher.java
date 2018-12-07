@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
  * </pre>
  */
 public class Pusher {
-    private static final Gson BODY_SERIALISER = new GsonBuilder()
+    private static final Gson bodySerialiser = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
 
@@ -356,9 +356,9 @@ public class Pusher {
         String body;
         if (Crypto.isEncryptedChannel(channels.get(0))) {
             EncryptedPayload dataEncrypted = pusherCrypto.encrypt(channels.get(0), data);
-            body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(dataEncrypted), socketId));
+            body = bodySerialiser.toJson(new TriggerData(channels, eventName, serialise(dataEncrypted), socketId));
         } else {
-            body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
+            body = bodySerialiser.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
         }
         return post("/events", body);
     }
@@ -391,7 +391,7 @@ public class Pusher {
                 )
             );
         }
-        final String body = BODY_SERIALISER.toJson(new EventBatch(eventsWithSerialisedBodies));
+        final String body = bodySerialiser.toJson(new EventBatch(eventsWithSerialisedBodies));
 
         return post("/batch_events", body);
     }
@@ -545,7 +545,7 @@ public class Pusher {
         if (Crypto.isEncryptedChannel(channel)) {
             sharedSecret = Base64.getEncoder().encodeToString(pusherCrypto.generateSharedSecret(channel));
         }
-        return BODY_SERIALISER.toJson(new AuthData(key, signature, sharedSecret));
+        return bodySerialiser.toJson(new AuthData(key, signature, sharedSecret));
     }
 
     /**
@@ -572,9 +572,9 @@ public class Pusher {
             throw new IllegalArgumentException("Authentication is only applicable to private, private-encrypted, and presence channels");
         }
 
-        final String channelData = BODY_SERIALISER.toJson(user);
+        final String channelData = bodySerialiser.toJson(user);
         final String signature = SignatureUtil.sign(socketId + ":" + channel + ":" + channelData, secret);
-        return BODY_SERIALISER.toJson(new AuthData(key, signature, channelData, null));
+        return bodySerialiser.toJson(new AuthData(key, signature, channelData, null));
     }
 
     /*

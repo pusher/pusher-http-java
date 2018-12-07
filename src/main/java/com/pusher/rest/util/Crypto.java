@@ -11,24 +11,24 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 /**
- * Crypto is a class containing all the utility methods needed to do End to End Encryption for End to End Encrypted Channels.
+ * Crypto is a class containing all the utility methods needed to do End to End Encryption for Encrypted Channels.
  * Read more here: https://pusher.com/docs/client_api_guide/client_encrypted_channels
  */
 public class Crypto {
     /**
      * The prefix that is used to identify End to End Encrypted Channels
      */
-    private static final String PRIVATE_ENCRYPTED_CHANNEL_PREFIX = "private-encrypted-";
+    private static final String privateEncryptedChannelPrefix = "private-encrypted-";
 
     /**
      * The GSON instance to be used for serialisation
      */
-    private final Gson BODY_SERIALISER;
+    private final Gson bodySerialiser;
 
     /**
      * 32 character long secret you define for end to end encryption
      */
-    private final String ENCRYPTION_MASTER_KEY;
+    private final String encryptionMasterKey;
 
     /** Construct an instance of the Crypto object which will allow for encryption of Pusher Channels payloads.
      * @param encryptionMasterKey The Encryption Master Key, a 32 character long secret you define for end to end encryption
@@ -36,8 +36,8 @@ public class Crypto {
      * @throws RuntimeException if Libsodium isn't available on the platform
      */
     public Crypto(String encryptionMasterKey, Gson serialiser) throws RuntimeException {
-        this.BODY_SERIALISER = serialiser;
-        this.ENCRYPTION_MASTER_KEY = encryptionMasterKey;
+        this.bodySerialiser = serialiser;
+        this.encryptionMasterKey = encryptionMasterKey;
         if (!cryptoAvailable()) {
             throw new RuntimeException("The Pusher client requires Libsodium for End to End Encryption");
         }
@@ -56,7 +56,7 @@ public class Crypto {
         byte[] sharedSecret = generateSharedSecret(channelName);
         byte[] nonce = generateNonce();
         String nonceB64 = Base64.getEncoder().encodeToString(nonce);
-        String serialisedData = BODY_SERIALISER.toJson(data);
+        String serialisedData = bodySerialiser.toJson(data);
         SecretBox s = new SecretBox(sharedSecret);
         byte[] cipherText = s.encrypt(nonce, serialisedData.getBytes());
         String CipherTextB64 = Base64.getEncoder().encodeToString(cipherText);
@@ -71,7 +71,7 @@ public class Crypto {
     public byte[] generateSharedSecret(String channelName) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            return digest.digest((channelName+ ENCRYPTION_MASTER_KEY).getBytes(StandardCharsets.UTF_8));
+            return digest.digest((channelName+ encryptionMasterKey).getBytes(StandardCharsets.UTF_8));
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Your platform does not support SHA-256, which is required for end to end encryption");
         }
@@ -83,7 +83,7 @@ public class Crypto {
      * @return Boolean true if it is, false if not.
      */
     public static boolean isEncryptedChannel(String channelName) {
-        return channelName.startsWith(PRIVATE_ENCRYPTED_CHANNEL_PREFIX);
+        return channelName.startsWith(privateEncryptedChannelPrefix);
     }
 
     /**

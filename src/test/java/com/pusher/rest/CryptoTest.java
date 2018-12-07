@@ -14,7 +14,7 @@ import java.util.Base64;
 import static org.junit.Assume.assumeTrue;
 
 public class CryptoTest {
-    private static final Gson BODY_SERIALISER = new GsonBuilder()
+    private static final Gson bodySerialiser = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
 
@@ -22,7 +22,7 @@ public class CryptoTest {
     @Before
     public void initialize() {
         if (Crypto.cryptoAvailable()) {
-             pc = new Crypto("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", BODY_SERIALISER);
+             pc = new Crypto("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", bodySerialiser);
         }
     }
     @Test
@@ -41,7 +41,7 @@ public class CryptoTest {
         }
 
         // Check that the secret generation is using the encryption master key as a part of the generation
-        Crypto pc2 = new Crypto("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", BODY_SERIALISER);
+        Crypto pc2 = new Crypto("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", bodySerialiser);
         byte[] sharedSecret3 = pc2.generateSharedSecret("private-encrypted-channel-a");
 
 
@@ -81,7 +81,7 @@ public class CryptoTest {
         String channelName = "private-encrypted-bla";
         String data = "Hello! Hello! Hello!";
         String encryptionKey = "This is a string that is 32 chars";
-        Crypto pc = new Crypto(encryptionKey, BODY_SERIALISER);
+        Crypto pc = new Crypto(encryptionKey, bodySerialiser);
         EncryptedPayload ep = pc.encrypt(channelName, data);
         Assert.assertNotNull(ep.getCiphertext());
         Assert.assertNotNull(ep.getNonce());
