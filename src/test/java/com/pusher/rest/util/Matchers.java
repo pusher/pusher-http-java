@@ -1,15 +1,17 @@
 package com.pusher.rest.util;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Map;
-
+import com.google.gson.Gson;
+import com.pusher.rest.data.Event;
+import com.pusher.rest.data.EventBatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
-import com.google.gson.Gson;
+import java.io.ByteArrayOutputStream;
+import java.util.List;
+import java.util.Map;
 
 public class Matchers {
 
@@ -34,6 +36,38 @@ public class Matchers {
             }
         };
     }
+
+    public static <T> Matcher<HttpPost> anyDataInBatchField(final String fieldName) {
+        return new TypeSafeDiagnosingMatcher<HttpPost>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("HTTP request with field [" + fieldName + "]");
+            }
+
+            @Override
+            public boolean matchesSafely(HttpPost item, Description mismatchDescription) {
+                try {
+                    @SuppressWarnings("unchecked")
+                    Gson gson = new Gson();
+                    List<Event> eventBatchList = gson.fromJson(retrieveBody(item), EventBatch.class).getBatch();
+                    for (Event e : eventBatchList) {
+                        String payload = (String)e.getData();
+                        Map m = gson.fromJson(payload, Map.class);
+                        // If the field ever appears for any payload, return true.
+                        if(m.containsKey(fieldName)) {
+                            return true;
+                        }
+                    }
+                    // If the field never occurs in any payload, return false.
+                    return false;
+                }
+                catch (Exception e) {
+                    return false;
+                }
+            }
+        };
+    }
+
     public static Matcher<HttpRequestBase> path(final String expected) {
         return new TypeSafeDiagnosingMatcher<HttpRequestBase>() {
             @Override

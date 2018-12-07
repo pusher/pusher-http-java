@@ -4,7 +4,6 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.GsonBuilder;
 import com.pusher.rest.data.Event;
 import com.pusher.rest.util.Crypto;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.jmock.Expectations;
@@ -17,8 +16,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.*;
 
-import static com.pusher.rest.util.Matchers.field;
-import static com.pusher.rest.util.Matchers.path;
+import static com.pusher.rest.util.Matchers.*;
 import static org.junit.Assume.assumeTrue;
 
 /**
@@ -34,20 +32,26 @@ public class PusherTest {
         setImposteriser(ClassImposteriser.INSTANCE);
     }};
 
-    private CloseableHttpClient httpClient;
+    private CloseableHttpClient httpClient = context.mock(CloseableHttpClient.class);
 
     private final Pusher p = new Pusher(APP_ID, KEY, SECRET);
     private final Pusher pencrypted = new Pusher(APP_ID, KEY, SECRET, EncryptionMasterKey);
 
     @Before
     public void setup() {
-        httpClient = context.mock(CloseableHttpClient.class);
         p.configureHttpClient(new HttpClientBuilder() {
             @Override
             public CloseableHttpClient build() {
                 return httpClient;
             }
         });
+        pencrypted.configureHttpClient(new HttpClientBuilder() {
+            @Override
+            public CloseableHttpClient build() {
+                return httpClient;
+            }
+        });
+
 
     }
 
@@ -154,28 +158,16 @@ public class PusherTest {
 
     @Test
     public void batchEventsEncrypted() throws IOException {
-        final List<Map<String, Object>> res = new ArrayList<Map<String, Object>>() {{
-            add(new HashMap<String, Object>() {{
-                put("channel", "my-channel2");
-                put("name", "event-name");
-                put("data", "{\"aString\":\"value1\",\"aNumber\":42}");
-            }});
-
-            add(new HashMap<String, Object>() {{
-                put("channel", "my-channel");
-                put("name", "event-name");
-                put("data", "{\"aString\":\"value2\",\"aNumber\":43}");
-                put("socket_id", "22.33");
-            }});
-        }};
 
         context.checking(new Expectations() {{
-            oneOf(httpClient).execute(with(any(HttpUriRequest.class)));
+            oneOf(httpClient).execute(
+                    with(anyDataInBatchField("ciphertext"))
+            );
         }});
 
         List<Event> batch = new ArrayList<Event>();
         batch.add(new Event("my-channel", "event-name", new MyPojo("value1", 42)));
-        batch.add(new Event("my-channel", "event-name", new MyPojo("value2", 43), "22.33"));
+        batch.add(new Event("private-encrypted-my-channel", "event-name", new MyPojo("value2", 43), "22.33"));
 
         pencrypted.trigger(batch);
     }
