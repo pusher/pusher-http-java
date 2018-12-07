@@ -1,4 +1,4 @@
-package com.pusher.rest.util;
+package com.pusher.rest.data;
 
 public class EncryptedPayload {
 

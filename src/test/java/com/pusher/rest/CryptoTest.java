@@ -4,7 +4,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pusher.rest.util.Crypto;
-import com.pusher.rest.util.EncryptedPayload;
+import com.pusher.rest.data.EncryptedPayload;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

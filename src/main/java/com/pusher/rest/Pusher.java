@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pusher.rest.data.*;
 import com.pusher.rest.util.Crypto;
-import com.pusher.rest.util.EncryptedPayload;
 import com.pusher.rest.util.Prerequisites;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;

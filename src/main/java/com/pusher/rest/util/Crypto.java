@@ -1,6 +1,7 @@
 package com.pusher.rest.util;
 
 import com.google.gson.Gson;
+import com.pusher.rest.data.EncryptedPayload;
 import org.abstractj.kalium.crypto.Random;
 import org.abstractj.kalium.crypto.SecretBox;
 
