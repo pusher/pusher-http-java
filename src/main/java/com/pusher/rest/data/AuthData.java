@@ -13,9 +13,10 @@ public class AuthData {
      *
      * @param key App key
      * @param signature Auth signature
+     * @param sharedSecret The key that the client should use to decrypt messages sent on private encrypted channels.
      */
-    public AuthData(final String key, final String signature, final String shared_secret) {
-        this(key, signature, null, shared_secret);
+    public AuthData(final String key, final String signature, final String sharedSecret) {
+        this(key, signature, null, sharedSecret);
     }
 
     /**
@@ -24,6 +25,7 @@ public class AuthData {
      * @param key App key
      * @param signature Auth signature
      * @param channelData Extra user data
+     * @param sharedSecret The key that the client should use to decrypt messages sent on private encrypted channels.
      */
     public AuthData(final String key, final String signature, final String channelData, final String sharedSecret) {
         this.auth = key + ":" + signature;
