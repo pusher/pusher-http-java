@@ -38,7 +38,7 @@ public class Crypto {
     public Crypto(String encryptionMasterKey, Gson serialiser) throws RuntimeException {
         this.BODY_SERIALISER = serialiser;
         this.ENCRYPTION_MASTER_KEY = encryptionMasterKey;
-        if(!cryptoAvailable()) {
+        if (!cryptoAvailable()) {
             throw new RuntimeException("The Pusher client requires Libsodium for End to End Encryption");
         }
     }
@@ -50,7 +50,7 @@ public class Crypto {
      * @return EncryptedPayload object containing a nonce and the ciphertext.
      */
     public EncryptedPayload encrypt(String channelName, Object data) {
-        if(!isEncryptedChannel(channelName)){
+        if (!isEncryptedChannel(channelName)){
             throw new IllegalArgumentException("Tried to encrypt an event for a channel lacking the `private-encrypted-` prefix");
         }
         byte[] sharedSecret = generateSharedSecret(channelName);

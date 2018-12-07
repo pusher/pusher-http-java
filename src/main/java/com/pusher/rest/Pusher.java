@@ -108,7 +108,7 @@ public class Pusher {
         this.key = key;
         this.secret = secret;
         configure();
-        if(encryptionMasterKey != null) {
+        if (encryptionMasterKey != null) {
             Prerequisites.isValidEncryptionMasterKey(encryptionMasterKey);
             pusherCrypto = new Crypto(encryptionMasterKey, dataMarshaller);
         }
@@ -354,7 +354,7 @@ public class Pusher {
         Prerequisites.isValidSocketId(socketId);
         Prerequisites.eitherOneorNoEncryptedChannels(channels);
         String body;
-        if(Crypto.isEncryptedChannel(channels.get(0))) {
+        if (Crypto.isEncryptedChannel(channels.get(0))) {
             EncryptedPayload dataEncrypted = pusherCrypto.encrypt(channels.get(0), data);
             body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(dataEncrypted), socketId));
         } else {
@@ -376,7 +376,7 @@ public class Pusher {
         for (final Event e : batch) {
             String payload;
             // Encrypt events sent to channels that are encrypted
-            if(Crypto.isEncryptedChannel(e.getChannel())) {
+            if (Crypto.isEncryptedChannel(e.getChannel())) {
                 EncryptedPayload ep = pusherCrypto.encrypt(e.getChannel(), serialise(e.getData()));
                 payload = serialise(ep);
             } else {
@@ -542,7 +542,7 @@ public class Pusher {
 
         final String signature = SignatureUtil.sign(socketId + ":" + channel, secret);
         String sharedSecret = null;
-        if(Crypto.isEncryptedChannel(channel)) {
+        if (Crypto.isEncryptedChannel(channel)) {
             sharedSecret = Base64.getEncoder().encodeToString(pusherCrypto.generateSharedSecret(channel));
         }
         return BODY_SERIALISER.toJson(new AuthData(key, signature, sharedSecret));
@@ -574,7 +574,7 @@ public class Pusher {
 
         final String channelData = BODY_SERIALISER.toJson(user);
         final String signature = SignatureUtil.sign(socketId + ":" + channel + ":" + channelData, secret);
-        return BODY_SERIALISER.toJson(new AuthData(key, signature, channelData,null));
+        return BODY_SERIALISER.toJson(new AuthData(key, signature, channelData, null));
     }
 
     /*

@@ -21,7 +21,7 @@ public class CryptoTest {
     private Crypto pc = null;
     @Before
     public void initialize() {
-        if(Crypto.cryptoAvailable()) {
+        if (Crypto.cryptoAvailable()) {
              pc = new Crypto("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", BODY_SERIALISER);
         }
     }
@@ -36,7 +36,7 @@ public class CryptoTest {
 
         // Check that the secret generation is using the channel as a part of the generation
         byte[] sharedSecret2 = pc.generateSharedSecret("private-encrypted-channel-b");
-        if(sharedSecret == sharedSecret2) {
+        if (sharedSecret == sharedSecret2) {
             Assert.fail();
         }
 
@@ -46,7 +46,7 @@ public class CryptoTest {
 
 
         String sharedSecret3B64 = Base64.getEncoder().encodeToString(sharedSecret3);
-        if(sharedSecretB64.equals(sharedSecret3B64)) {
+        if (sharedSecretB64.equals(sharedSecret3B64)) {
             Assert.fail();
         }
     }

@@ -54,7 +54,7 @@ public class Matchers {
                         String payload = (String)e.getData();
                         Map m = gson.fromJson(payload, Map.class);
                         // If the field ever appears for any payload, return true.
-                        if(m.containsKey(fieldName)) {
+                        if (m.containsKey(fieldName)) {
                             return true;
                         }
                     }

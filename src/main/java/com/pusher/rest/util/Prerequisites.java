@@ -76,7 +76,7 @@ public final class Prerequisites {
 
     public static void eitherOneorNoEncryptedChannels(List<String> channels) {
         for (String channel : channels) {
-            if(channel.startsWith("private-encrypted-") && channels.size() > 1) {
+            if (channel.startsWith("private-encrypted-") && channels.size() > 1) {
                 throw new IllegalArgumentException("Batch events containing private-encrypted channels are not supported.");
             }
         }
