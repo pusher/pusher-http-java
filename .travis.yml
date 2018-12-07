@@ -1,23 +1,17 @@
-language: java
 dist: xenial
+jdk:
+  - openjdk-8
+  - openjdk-9
+  - openjdk-10
+  - openjdk-11
+
 matrix:
   include:
-  # Test Java version without installing Libsodium to check tests still pass
-  - jdk:
-      openjdk-8
-      openjdk-9
-      openjdk-10
-      openjdk-11
-    addons:
-      apt:
-        packages:
-          - libsodium-dev
-  - jdk:
-      openjdk-8
-      openjdk-9
-      openjdk-10
-      openjdk-11
-
+    - jvm: openjdk-11
+      addons:
+        apt:
+          packages:
+            - libsodium-dev
 
 before_install:
 - unset _JAVA_OPTIONS
