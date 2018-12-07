@@ -34,25 +34,21 @@ public class PusherTest {
         setImposteriser(ClassImposteriser.INSTANCE);
     }};
 
-    private CloseableHttpClient httpClient = context.mock(CloseableHttpClient.class);
+    private CloseableHttpClient httpClient;
 
     private final Pusher p = new Pusher(APP_ID, KEY, SECRET);
     private final Pusher pencrypted = new Pusher(APP_ID, KEY, SECRET, EncryptionMasterKey);
 
     @Before
     public void setup() {
+        httpClient = context.mock(CloseableHttpClient.class);
         p.configureHttpClient(new HttpClientBuilder() {
             @Override
             public CloseableHttpClient build() {
                 return httpClient;
             }
         });
-        pencrypted.configureHttpClient(new HttpClientBuilder() {
-            @Override
-            public CloseableHttpClient build() {
-                return httpClient;
-            }
-        });
+
     }
 
     /*
@@ -128,9 +124,27 @@ public class PusherTest {
 
     @Test
     public void batchEvents() throws IOException {
+        final List<Map<String, Object>> res = new ArrayList<Map<String, Object>>() {{
+            add(new HashMap<String, Object>() {{
+                put("channel", "my-channel");
+                put("name", "event-name");
+                put("data", "{\"aString\":\"value1\",\"aNumber\":42}");
+            }});
+
+            add(new HashMap<String, Object>() {{
+                put("channel", "my-channel");
+                put("name", "event-name");
+                put("data", "{\"aString\":\"value2\",\"aNumber\":43}");
+                put("socket_id", "22.33");
+            }});
+        }};
+
         context.checking(new Expectations() {{
-            oneOf(httpClient).execute(with(any(HttpUriRequest.class)));
+            oneOf(httpClient).execute(
+                    with(field("batch", res))
+            );
         }});
+
         List<Event> batch = new ArrayList<Event>();
         batch.add(new Event("my-channel", "event-name", new MyPojo("value1", 42)));
         batch.add(new Event("my-channel", "event-name", new MyPojo("value2", 43), "22.33"));
@@ -140,13 +154,27 @@ public class PusherTest {
 
     @Test
     public void batchEventsEncrypted() throws IOException {
+        final List<Map<String, Object>> res = new ArrayList<Map<String, Object>>() {{
+            add(new HashMap<String, Object>() {{
+                put("channel", "my-channel2");
+                put("name", "event-name");
+                put("data", "{\"aString\":\"value1\",\"aNumber\":42}");
+            }});
+
+            add(new HashMap<String, Object>() {{
+                put("channel", "my-channel");
+                put("name", "event-name");
+                put("data", "{\"aString\":\"value2\",\"aNumber\":43}");
+                put("socket_id", "22.33");
+            }});
+        }};
 
         context.checking(new Expectations() {{
             oneOf(httpClient).execute(with(any(HttpUriRequest.class)));
         }});
 
-        List<Event> batch = new ArrayList<>();
-        batch.add(new Event("private-encrypted-my-channel", "event-name", new MyPojo("value1", 42)));
+        List<Event> batch = new ArrayList<Event>();
+        batch.add(new Event("my-channel", "event-name", new MyPojo("value1", 42)));
         batch.add(new Event("my-channel", "event-name", new MyPojo("value2", 43), "22.33"));
 
         pencrypted.trigger(batch);
