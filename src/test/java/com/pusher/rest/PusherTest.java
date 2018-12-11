@@ -35,7 +35,8 @@ public class PusherTest {
     private CloseableHttpClient httpClient = context.mock(CloseableHttpClient.class);
 
     private final Pusher p = new Pusher(APP_ID, KEY, SECRET);
-    private final Pusher pencrypted = new Pusher(APP_ID, KEY, SECRET, EncryptionMasterKey);
+    private Pusher pencrypted;
+
 
     @Before
     public void setup() {
@@ -45,14 +46,15 @@ public class PusherTest {
                 return httpClient;
             }
         });
-        pencrypted.configureHttpClient(new HttpClientBuilder() {
-            @Override
-            public CloseableHttpClient build() {
-                return httpClient;
-            }
-        });
-
-
+        if (Crypto.cryptoAvailable()) {
+            pencrypted = new Pusher(APP_ID, KEY, SECRET, EncryptionMasterKey);
+            pencrypted.configureHttpClient(new HttpClientBuilder() {
+                @Override
+                public CloseableHttpClient build() {
+                    return httpClient;
+                }
+            });
+        }
     }
 
     /*
@@ -158,7 +160,7 @@ public class PusherTest {
 
     @Test
     public void batchEventsEncrypted() throws IOException {
-
+        assumeTrue(Crypto.cryptoAvailable());
         context.checking(new Expectations() {{
             oneOf(httpClient).execute(
                     with(anyDataInBatchField("ciphertext"))
