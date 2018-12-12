@@ -1,13 +1,17 @@
 dist: trusty
+# These builds run without the underlying libsodium dependency. This ensures the tests pass with and without it.
 jdk:
+  # openjdk-8 and Travis don't seem to mix, so we'll test using oraclejdk8 here.
   - oraclejdk8
   - openjdk-9
   - openjdk-10
   - openjdk-11
 
+# This job runs the tests with the underlying dependency libsodium installed.
 matrix:
   include:
     - jdk: openjdk-11
+      # Libsodium is only available on the xenial build image with Travis, hence it's use here.
       dist: xenial
       addons:
         apt:
@@ -21,13 +25,5 @@ install:
 - echo "Installing deps"
   mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 
-before_script:
-- echo JAVA_HOME = ${JAVA_HOME}
-- echo PATH = ${PATH}
-
 script:
 - mvn test
-
-after_script:
-- ls ${JAVA_HOME}
-- cat "${JAVA_HOME}/release"
