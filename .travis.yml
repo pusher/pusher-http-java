@@ -1,6 +1,4 @@
 ---
-# use faster container
-sudo: false
 language: java
 jdk:
   - oraclejdk8
