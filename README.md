@@ -40,10 +40,10 @@ pusher.setCluster(<cluster>);
 The basic parameters may also be set from a URL, as provided (for example) as an environment variable when running on Heroku with the Pusher addon:
 
 ```java
-Pusher pusher = new Pusher("http://<key>:<secret>@api.pusherapp.com:80/apps/<appId>");
+Pusher pusher = new Pusher("http://<key>:<secret>@api-<cluster>.pusher.com/apps/app_id");
 ```
 
-Note: the API URL differs depending on the cluster your app was created in:
+Note: the API URL differs depending on the cluster your app was created in. For example:
 
 ```
 http://<key>:<secret>@api-mt1.pusher.com/apps/app_id
