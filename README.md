@@ -29,12 +29,25 @@ The minimum configuration required to use the `Pusher` object are the three cons
 Pusher pusher = new Pusher(appId, apiKey, apiSecret);
 ```
 
+You then need to specify your app cluster (eg `mt1`/`eu`/`ap1`/`us2`)
+
+```java
+pusher.setCluster(<cluster>);
+```
+
 ### From URL
 
 The basic parameters may also be set from a URL, as provided (for example) as an environment variable when running on Heroku with the Pusher addon:
 
 ```java
-Pusher pusher = new Pusher("http://<key>:<secret>@api.pusherapp.com:80/apps/<appId>");
+Pusher pusher = new Pusher("http://<key>:<secret>@api-<cluster>.pusher.com/apps/app_id");
+```
+
+Note: the API URL differs depending on the cluster your app was created in. For example:
+
+```
+http://<key>:<secret>@api-mt1.pusher.com/apps/app_id
+http://<key>:<secret>@api-eu.pusher.com/apps/app_id
 ```
 
 This form sets the `key`, `secret`, `appId`, `host` and `secure` (based on the protocol in the URL) parameters all at once.
@@ -43,15 +56,12 @@ This form sets the `key`, `secret`, `appId`, `host` and `secure` (based on the p
 
 There are additional options which can be set on the `Pusher` object once constructed:
 
-#### Cluster or host
+#### Host
 
-If you are using an alternative Pusher cluster, you can provide its name to the `setCluster` method.
 
 If you wish to set a non-standard endpoint, perhaps for testing, you may use `setHost`.
 
 ```java
-pusher.setCluster("eu");
-// OR, equivalent but more flexible:
 pusher.setHost("api-eu.pusher.com");
 ```
 
