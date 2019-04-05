@@ -86,7 +86,7 @@ public class PusherTest {
     public void customSerialisationGson() throws Exception {
         p.setDataMarshaller(new DataMarshaller() {
             private Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create();
-            public String marshall(final Object data) {
+            public String marshal(final Object data) {
                 return gson.toJson(data);
             }
         });

@@ -9,7 +9,7 @@ public class DefaultDataMarshaller implements DataMarshaller {
 
    private final Gson gson = new Gson();
 
-   public String marshall(final Object data) {
+   public String marshal(final Object data) {
       return gson.toJson(data);
    }
 }

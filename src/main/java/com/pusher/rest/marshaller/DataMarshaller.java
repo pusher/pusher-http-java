@@ -5,5 +5,5 @@ package com.pusher.rest.marshaller;
  */
 public interface DataMarshaller {
 
-   String marshall(final Object data);
+   String marshal(final Object data);
 }

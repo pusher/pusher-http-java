@@ -276,7 +276,7 @@ public class Pusher {
      * @return a serialised event payload
      */
     protected String serialise(final Object data) {
-        return dataMarshaller.marshall(data);
+        return dataMarshaller.marshal(data);
     }
 
     /*
