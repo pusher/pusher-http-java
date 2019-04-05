@@ -184,10 +184,28 @@ public class Pusher {
     }
 
     /**
+     * Set the Gson instance used to marshal Objects passed to {@link #trigger(List, String, Object)}
      * Set the marshaller used to serialize Objects passed to {@link #trigger(List, String, Object)}
      * and friends.
+     * By default, the library marshals the objects provided to JSON using the Gson library
+     * (see https://code.google.com/p/google-gson/ for more details). By providing an instance
+     * here, you may exert control over the marshalling, for example choosing how Java property
+     * names are mapped on to the field names in the JSON representation, allowing you to match
+     * the expected scheme on the client side.
+     * We added the {@link #setDataMarshaller(DataMarshaller)} method to allow specification
+     * of other marshalling libraries. This method was kept around to maintain backwards
+     * compatibility.
+     * @param gson a GSON instance configured to your liking
+     */
+    public void setGsonSerialiser(final Gson gson) {
+        setDataMarshaller(new DefaultDataMarshaller(gson));
+    }
+
+    /**
+     * Set a custom marshaller used to serialize Objects passed to {@link #trigger(List, String, Object)}
+     * and friends.
      * <p>
-     * By default, the library marshalls the objects provided to JSON using the Gson library
+     * By default, the library marshals the objects provided to JSON using the Gson library
      * (see https://code.google.com/p/google-gson/ for more details). By providing an instance
      * here, you may exert control over the marshalling, for example choosing how Java property
      * names are mapped on to the field names in the JSON representation, allowing you to match

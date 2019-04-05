@@ -81,9 +81,20 @@ public class PusherTest {
 
         p.trigger("my-channel", "event", new MyPojo());
     }
+    @Test
+
+    public void customSerialisationGson() throws Exception {
+        p.setGsonSerialiser(new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create());
+
+        context.checking(new Expectations() {{
+            oneOf(httpClient).execute(with(field("data", "{\"a-string\":\"value\",\"a-number\":42}")));
+        }});
+
+        p.trigger("my-channel", "event", new MyPojo());
+    }
 
     @Test
-    public void customSerialisationGson() throws Exception {
+    public void customSerialisationDataMarshaller() throws Exception {
         p.setDataMarshaller(new DataMarshaller() {
             private Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create();
             public String marshal(final Object data) {
