@@ -103,7 +103,9 @@ Requests return a member of the `Result` class. Results have a `getStatus` metho
 
 To send an event to one or more channels use the `trigger` method.
 
-The data parameter is serialised using the GSON library (<https://code.google.com/p/google-gson/>). POJO classes or `java.util.Map`s are suitable.
+The data parameter is serialised using the GSON library (<https://code.google.com/p/google-gson/>) by default. You may
+specify your own marshalling library if you wish by using the `setDataMarshaller` method. POJO classes or `java.util.Map`s
+are suitable for marshalling.
 
 #### Single channel
 
