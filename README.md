@@ -1,9 +1,9 @@
-# Pusher Java HTTP library
+# Pusher Channels Java HTTP library
 
 [![Build
 Status](https://travis-ci.org/pusher/pusher-http-java.svg?branch=master)](https://travis-ci.org/pusher/pusher-http-java)
 
-In order to use this library, you need to have an account on <http://pusher.com>. After registering, you will need the application credentials for your app.
+In order to use this library, you need to have an account on <http://pusher.com/channels>. After registering, you will need the application credentials for your app.
 
 ## Installation
 
@@ -23,7 +23,7 @@ Javadocs for the latest version are published at <http://pusher.github.io/pusher
 
 ## Configuration
 
-The minimum configuration required to use the `Pusher` object are the three constructor arguments which identify your Pusher app. You can find them by going to "API Keys" on your app at <https://app.pusher.com>.
+The minimum configuration required to use the `Pusher` object are the three constructor arguments which identify your Pusher app. You can find them by going to "API Keys" on your app at <https://dashboard.pusher.com>.
 
 ```java
 Pusher pusher = new Pusher(appId, apiKey, apiSecret);
@@ -37,7 +37,7 @@ pusher.setCluster(<cluster>);
 
 ### From URL
 
-The basic parameters may also be set from a URL, as provided (for example) as an environment variable when running on Heroku with the Pusher addon:
+The basic parameters may also be set from a URL, as provided (for example) as an environment variable when running on Heroku with the Pusher Channels addon:
 
 ```java
 Pusher pusher = new Pusher("http://<key>:<secret>@api-<cluster>.pusher.com/apps/app_id");
@@ -79,7 +79,7 @@ HTTPS can be used as transport by calling `setEncrypted(true)`. Note that your c
 
 #### Advanced HTTP configuration
 
-The library uses Apache HTTP Client (4 series) internally to make HTTP requests. In order to expose some of the rich and fine configuration available in this component, it is partially exposed. The HttpClient uses the Builder pattern to specify configuration. The Pusher library exposes a method to fetch an `HttpClientBuilder` with sensible defaults, and a method to set the client instance in use to one created by a particular builder. By using these two methods, you can further configure the client, overriding defaults or adding new settings.
+The library uses Apache HTTP Client (4 series) internally to make HTTP requests. In order to expose some of the rich and fine configuration available in this component, it is partially exposed. The HttpClient uses the Builder pattern to specify configuration. The Pusher Channels library exposes a method to fetch an `HttpClientBuilder` with sensible defaults, and a method to set the client instance in use to one created by a particular builder. By using these two methods, you can further configure the client, overriding defaults or adding new settings.
 
 For example:
 
@@ -127,7 +127,7 @@ You can trigger an event to at most 10 channels at once. Passing more than 10 ch
 
 #### Excluding event recipients
 
-In order to avoid the client that triggered the event from also receiving it, the `trigger` function takes an optional `socketId` parameter. For more information see: <http://pusher.com/docs/publisher_api_guide/publisher_excluding_recipients>.
+In order to avoid the client that triggered the event from also receiving it, the `trigger` function takes an optional `socketId` parameter. For more information see: <https://pusher.com/docs/channels/server_api/excluding-event-recipients>.
 
 ```java
 pusher.trigger(channel, event, data, "1302.1081607");
@@ -135,17 +135,17 @@ pusher.trigger(channel, event, data, "1302.1081607");
 
 ### Authenticating private channels
 
-To authorise your users to access private channels on Pusher, you can use the `authenticate` method. This method returns the response body which should be returned to the user requesting authentication.
+To authorise your users to access private channels on Channels, you can use the `authenticate` method. This method returns the response body which should be returned to the user requesting authentication.
 
 ```java
 String authBody = pusher.authenticate(socketId, channel);
 ```
 
-For more information see: <http://pusher.com/docs/authenticating_users>
+For more information see: <https://pusher.com/docs/channels/server_api/authenticating-users>
 
 ### Authenticating presence channels
 
-Using presence channels is similar to private channels, but you can specify extra data to identify that particular user. This data is passed as a `PresenceUser` object. As with the message data in `trigger`, the `userInfo` is serialised using GSON.
+Using presence channels is similar to using private channels, but you can specify extra data to identify that particular user. This data is passed as a `PresenceUser` object. As with the message data in `trigger`, the `userInfo` is serialised using GSON.
 
 ```java
 String userId = "unique_user_id";
@@ -156,7 +156,7 @@ userInfo.put("twitterId", "@leggetter");
 String authBody = pusher.authenticate(socketId, channel, new PresenceUser(userId, userInfo));
 ```
 
-For more information see: <http://pusher.com/docs/authenticating_users>
+For more information see: <https://pusher.com/docs/channels/server_api/authenticating-users>
 
 ### Application state
 
@@ -176,7 +176,7 @@ if (result.getStatus() == Status.SUCCESS) {
 }
 ```
 
-Information on the optional `params` and the structure of the returned JSON is defined in the [HTTP API reference](http://pusher.com/docs/rest_api#method-get-channels).
+Information on the optional `params` and the structure of the returned JSON is defined in the [HTTP API reference](https://pusher.com/docs/channels/library_auth_reference/rest-api#get-channels-fetch-info-for-multiple-channels-).
 
 #### Get the state of a channel
 
@@ -184,7 +184,7 @@ Information on the optional `params` and the structure of the returned JSON is d
 Result result = pusher.get("/channels/[channel_name]");
 ```
 
-Information on the optional `params` option property and the structure of the returned JSON is defined in the [HTTP API reference](http://pusher.com/docs/rest_api#method-get-channel).
+Information on the optional `params` option property and the structure of the returned JSON is defined in the [HTTP API reference](https://pusher.com/docs/channels/library_auth_reference/rest-api#get-channel-fetch-info-for-one-channel-).
 
 #### Get the list of users in a presence channel
 
@@ -192,11 +192,11 @@ Information on the optional `params` option property and the structure of the re
 Result result = pusher.get("/channels/[channel_name]/users");
 ```
 
-The `channel_name` in the path must be a [presence channel](http://pusher.com/docs/presence). The structure of the returned JSON is defined in the [HTTP API reference](http://pusher.com/docs/rest_api#method-get-users).
+The `channel_name` in the path must be a [presence channel](https://pusher.com/docs/channels/using_channels/presence-channels). The structure of the returned JSON is defined in the [HTTP API reference](https://pusher.com/docs/channels/library_auth_reference/rest-api#get-users).
 
 ### WebHooks
 
-The library provides a simple helper to validate the authenticity of webhooks received from Pusher.
+The library provides a simple helper to validate the authenticity of webhooks received from Channels.
 
 Call `validateWebhookSignature` with the values from the `X-Pusher-Key` and `X-Pusher-Signature` headers from the webhook request, and the body as a String. You will receive a member of `Validity` indicating whether the webhook could be validated or not.
 
@@ -236,7 +236,7 @@ Query parameters can't contain following keys, as they are used to sign the requ
 
 The library is threadsafe and intended for use from many threads simultaneously. By default, HTTP connections are persistent and a pool of open connections is maintained. This re-use reduces the overhead involved in repeated TCP connection establishments and teardowns.
 
-IO calls are blocking, and if more threads make requests at one time than the configured maximum pool size, they will wait for a conneciton to become idle. By default there are at most 2 concurrent connections maintained. This should be enough to many use cases, but it can be configured:
+IO calls are blocking, and if more threads make requests at one time than the configured maximum pool size, they will wait for a connection to become idle. By default there are at most 2 concurrent connections maintained. This should be enough to many use cases, but it can be configured:
 
 ```java
 PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager();
