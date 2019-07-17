@@ -14,10 +14,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.junit.Before;
-import org.junit.Test;
+import org.jmock.junit5.JUnit5Mockery;
+import org.jmock.imposters.ByteBuddyClassImposteriser;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -35,15 +36,15 @@ public class PusherTest {
     static final String KEY    = "157a2f3df564323a4a73";
     static final String SECRET = "3457a88be87f890dcd98";
 
-    private final Mockery context = new JUnit4Mockery() {{
-        setImposteriser(ClassImposteriser.INSTANCE);
+    private final Mockery context = new JUnit5Mockery() {{
+        setImposteriser(ByteBuddyClassImposteriser.INSTANCE);
     }};
 
     private CloseableHttpClient httpClient = context.mock(CloseableHttpClient.class);
 
     private final Pusher p = new Pusher(APP_ID, KEY, SECRET);
 
-    @Before
+    @BeforeEach
     public void setup() {
         p.configureHttpClient(new HttpClientBuilder() {
             @Override
@@ -195,11 +196,13 @@ public class PusherTest {
         p.trigger(channels, "event", Collections.singletonMap("name", "value"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void channelListLimitOverLimit() {
-        final List<String> channels = Arrays.asList(new String[] { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven" });
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            final List<String> channels = Arrays.asList(new String[] { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven" });
+            p.trigger(channels, "event", Collections.singletonMap("name", "value"));
+        });
 
-        p.trigger(channels, "event", Collections.singletonMap("name", "value"));
     }
 
     @Test
@@ -221,8 +224,10 @@ public class PusherTest {
         p.get("/channels");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void reservedParameter() {
-        p.get("/channels", Collections.singletonMap("auth_timestamp", "anything"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.get("/channels", Collections.singletonMap("auth_timestamp", "anything"));
+        });
     }
 }
