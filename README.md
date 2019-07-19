@@ -5,6 +5,9 @@ Status](https://travis-ci.org/pusher/pusher-http-java.svg?branch=master)](https:
 
 In order to use this library, you need to have an account on <http://pusher.com>. After registering, you will need the application credentials for your app.
 
+## Supported platforms
+ - Java 8+ - Tested with 8, 9, 10 and 11.
+
 ## Installation
 
 The pusher-http-java library is available in Maven Central:
