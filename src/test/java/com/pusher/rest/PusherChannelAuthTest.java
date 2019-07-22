@@ -1,11 +1,13 @@
 package com.pusher.rest;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.pusher.rest.data.PresenceUser;
 
@@ -25,64 +27,89 @@ public class PusherChannelAuthTest {
                 is("{\"auth\":\"278d425bdf160c739803:208cbbce2a22fd7d7c3509046b17a97b99d345cf4c195bc0d54af9004a022b0b\"}"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void privateChannelWrongPrefix() {
-        p.authenticate("1234.1234", "presence-foobar");
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate("1234.1234", "presence-foobar");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void privateChannelNoPrefix() {
-        p.authenticate("1234.1234", "foobar");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate("1234.1234", "foobar");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void trailingColonSocketId() {
-        p.authenticate("1.1:", "private-foobar");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate("1.1:", "private-foobar");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void trailingNLSocketId() {
-        p.authenticate("1.1\n", "private-foobar");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate("1.1\n", "private-foobar");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void leadingColonSocketId() {
-        p.authenticate(":1.1", "private-foobar");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate(":1.1", "private-foobar");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void leadingColonNLSocketId() {
-        p.authenticate(":\n1.1", "private-foobar");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate(":\n1.1", "private-foobar");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void trailingColonNLSocketId() {
-        p.authenticate("1.1\n:", "private-foobar");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate("1.1\n:", "private-foobar");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void trailingColonChannel() {
-        p.authenticate("1.1", "private-foobar:");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate("1.1", "private-foobar:");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void leadingColonChannel() {
-        p.authenticate("1.1", ":private-foobar");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate("1.1", ":private-foobar");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void leadingColonNLChannel() {
-        p.authenticate("1.1", ":\nprivate-foobar");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate("1.1", ":\nprivate-foobar");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void trailingColonNLChannel() {
-        p.authenticate("1.1", "private-foobar\n:");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate("1.1", "private-foobar\n:");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void trailingNLChannel() {
-        p.authenticate("1.1", "private-foobar\n");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate("1.1", "private-foobar\n");
+        });
     }
 
     @Test
@@ -91,13 +118,17 @@ public class PusherChannelAuthTest {
                 is("{\"auth\":\"278d425bdf160c739803:afaed3695da2ffd16931f457e338e6c9f2921fa133ce7dac49f529792be6304c\",\"channel_data\":\"{\\\"user_id\\\":10,\\\"user_info\\\":{\\\"name\\\":\\\"Mr. Pusher\\\"}}\"}"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void presenceChannelWrongPrefix() {
-        p.authenticate("1234.1234", "private-foobar", new PresenceUser("dave"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate("1234.1234", "private-foobar", new PresenceUser("dave"));
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void presenceChannelNoPrefix() {
-        p.authenticate("1234.1234", "foobar", new PresenceUser("dave"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            p.authenticate("1234.1234", "foobar", new PresenceUser("dave"));
+        });
     }
 }

@@ -1,7 +1,7 @@
 package com.pusher.rest;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 
@@ -13,9 +13,9 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.localserver.LocalTestServer;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.pusher.rest.data.Result;
 import com.pusher.rest.data.Result.Status;
@@ -33,7 +33,7 @@ public class PusherHttpTest {
 
     private Pusher p;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         server = new LocalTestServer(null, null);
         server.register("/*", new HttpRequestHandler() {
@@ -51,7 +51,7 @@ public class PusherHttpTest {
         p = new Pusher(PusherTest.APP_ID, PusherTest.KEY, PusherTest.SECRET);
     }
 
-    @After
+    @AfterEach
     public void teardown() throws Exception {
         server.stop();
     }
