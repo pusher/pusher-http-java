@@ -7,9 +7,7 @@ In order to use this library, you need to have an account on <http://pusher.com/
 
 ## Supported platforms
 
-- Java 8+
-  - The policy is to support versions of Java that have "Premier Support" in <https://www.oracle.com/technetwork/java/java-se-support-roadmap.html>.
-  - Tested with 8, 9, 10 and 11.
+- Java - supports Java SE versions 8, 9, 10 and 11.
 
 ## Installation
 
