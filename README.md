@@ -8,6 +8,8 @@ In order to use this library, you need to have an account on <http://pusher.com/
 ## Supported platforms
 
 - Java - supports Java SE versions 8, 9, 10 and 11.
+- OpenJDK
+- Oracle JDK
 
 ## Installation
 
