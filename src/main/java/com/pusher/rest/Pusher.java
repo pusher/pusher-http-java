@@ -357,7 +357,7 @@ public class Pusher {
         Prerequisites.nonNull("channels", channels);
         Prerequisites.nonNull("eventName", eventName);
         Prerequisites.nonNull("data", data);
-        Prerequisites.maxLength("channels", 10, channels);
+        Prerequisites.maxLength("channels", 100, channels);
         Prerequisites.noNullMembers("channels", channels);
         Prerequisites.areValidChannels(channels);
         Prerequisites.isValidSocketId(socketId);
