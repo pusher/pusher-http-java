@@ -6,7 +6,10 @@ Status](https://travis-ci.org/pusher/pusher-http-java.svg?branch=master)](https:
 In order to use this library, you need to have an account on <http://pusher.com/channels>. After registering, you will need the application credentials for your app.
 
 ## Supported platforms
- - Java 8+ - Tested with 8, 9, 10 and 11.
+
+- Java 8+
+  - The policy is to support versions of Java that have "Premier Support" in <https://www.oracle.com/technetwork/java/java-se-support-roadmap.html>.
+  - Tested with 8, 9, 10 and 11.
 
 ## Installation
 
