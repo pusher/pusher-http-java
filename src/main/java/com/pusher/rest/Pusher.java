@@ -10,12 +10,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.client.methods.CloseableHttpResponse; 
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -448,7 +447,7 @@ public class Pusher {
                 .build();
         request.setConfig(config);
 
-        HttpResponse response = null;
+        CloseableHttpResponse response = null;
 
         try {
             response = client.execute(request);
@@ -463,7 +462,12 @@ public class Pusher {
             return Result.fromException(e);
         } finally {
             // Ensure the response is fully closed
-            HttpClientUtils.closeQuietly(response);
+            try {
+                response.close();
+            }
+            catch (final IOException e) {
+                return Result.fromException(e);
+            }
         }
     }
 
