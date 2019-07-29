@@ -447,27 +447,22 @@ public class Pusher {
                 .build();
         request.setConfig(config);
 
-        CloseableHttpResponse response = null;
-
         try {
-            response = client.execute(request);
+            final CloseableHttpResponse response = client.execute(request);
 
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            response.getEntity().writeTo(baos);
-            final String responseBody = new String(baos.toByteArray(), "UTF-8");
+            try {
+                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                response.getEntity().writeTo(baos);
+                final String responseBody = new String(baos.toByteArray(), "UTF-8");
 
-            return Result.fromHttpCode(response.getStatusLine().getStatusCode(), responseBody);
+                return Result.fromHttpCode(response.getStatusLine().getStatusCode(), responseBody);
+            }
+            finally {
+                response.close();
+            }
         }
         catch (final IOException e) {
             return Result.fromException(e);
-        } finally {
-            // Ensure the response is fully closed
-            try {
-                response.close();
-            }
-            catch (final IOException e) {
-                return Result.fromException(e);
-            }
         }
     }
 
