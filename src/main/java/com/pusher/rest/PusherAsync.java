@@ -92,7 +92,7 @@ public class PusherAsync extends PusherAbstract<CompletableFuture<Result>> {
      * <pre>
      * pusher.configureHttpClient(
      *     config()
-     *         .setProxyServer(new ProxyServer(...))
+     *         .setProxyServer(proxyServer("127.0.0.1", 38080))
      *         .setMaxRequestRetry(5)
      * );
      * </pre>
