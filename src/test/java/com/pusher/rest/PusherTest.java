@@ -205,7 +205,8 @@ public class PusherTest {
     @Test
     public void channelListLimitOverLimit() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            final List<String> channels = Arrays.asList(new String[] { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven" });
+
+            final List<String> channels = Arrays.asList(new String[101]);
             p.trigger(channels, "event", Collections.singletonMap("name", "value"));
         });
 
