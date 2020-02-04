@@ -47,7 +47,7 @@ import java.net.URI;
  *
  * See {@link PusherAsync} for the asynchronous implementation.
  */
-public class Pusher extends PusherAbstract<Result> {
+public class Pusher extends PusherAbstract<Result> implements AutoCloseable {
 
     private int requestTimeout = 4000; // milliseconds
 
@@ -133,9 +133,8 @@ public class Pusher extends PusherAbstract<Result> {
      */
     public void configureHttpClient(final HttpClientBuilder builder) {
         try {
-            if (client != null) client.close();
-        }
-        catch (IOException e) {
+            close();
+        } catch (final Exception e) {
             // Not a lot useful we can do here
         }
 
@@ -147,12 +146,12 @@ public class Pusher extends PusherAbstract<Result> {
      */
 
     @Override
-    protected Result doGet(URI uri) {
+    protected Result doGet(final URI uri) {
         return httpCall(new HttpGet(uri));
     }
 
     @Override
-    protected Result doPost(URI uri, String body) {
+    protected Result doPost(final URI uri, final String body) {
         final StringEntity bodyEntity = new StringEntity(body, "UTF-8");
         bodyEntity.setContentType("application/json");
 
@@ -183,4 +182,12 @@ public class Pusher extends PusherAbstract<Result> {
             return Result.fromException(e);
         }
     }
+
+    @Override
+    public void close() throws Exception {
+        if (client != null) {
+            client.close();
+        }
+    }
+
 }

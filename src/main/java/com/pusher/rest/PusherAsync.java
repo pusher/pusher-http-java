@@ -49,7 +49,7 @@ import static org.asynchttpclient.Dsl.config;
  *
  * See {@link Pusher} for the synchronous implementation.
  */
-public class PusherAsync extends PusherAbstract<CompletableFuture<Result>> {
+public class PusherAsync extends PusherAbstract<CompletableFuture<Result>> implements AutoCloseable {
 
     private AsyncHttpClient client;
 
@@ -101,10 +101,8 @@ public class PusherAsync extends PusherAbstract<CompletableFuture<Result>> {
      */
     public void configureHttpClient(final DefaultAsyncHttpClientConfig.Builder builder) {
         try {
-            if (client != null && !client.isClosed()) {
-                client.close();
-            }
-        } catch (IOException e) {
+            close();
+        } catch (final Exception e) {
             // Not a lot useful we can do here
         }
 
@@ -116,7 +114,7 @@ public class PusherAsync extends PusherAbstract<CompletableFuture<Result>> {
      */
 
     @Override
-    protected CompletableFuture<Result> doGet(URI uri) {
+    protected CompletableFuture<Result> doGet(final URI uri) {
         final Request request = new RequestBuilder(HttpConstants.Methods.GET)
             .setUrl(uri.toString())
             .build();
@@ -125,7 +123,7 @@ public class PusherAsync extends PusherAbstract<CompletableFuture<Result>> {
     }
 
     @Override
-    protected CompletableFuture<Result> doPost(URI uri, String body) {
+    protected CompletableFuture<Result> doPost(final URI uri, final String body) {
         final Request request = new RequestBuilder(HttpConstants.Methods.POST)
                 .setUrl(uri.toString())
                 .setBody(body)
@@ -143,4 +141,12 @@ public class PusherAsync extends PusherAbstract<CompletableFuture<Result>> {
                 .thenApply(response -> Result.fromHttpCode(response.getStatusCode(), response.getResponseBody(UTF_8)))
                 .exceptionally(Result::fromThrowable);
     }
+
+    @Override
+    public void close() throws Exception {
+        if (client != null && !client.isClosed()) {
+            client.close();
+        }
+    }
+
 }
