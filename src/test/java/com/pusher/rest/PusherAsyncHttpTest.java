@@ -132,7 +132,7 @@ public class PusherAsyncHttpTest {
     }
 
     @Test
-    public void connectionRefusedReturnsNetworkError() throws Exception {
+    public void connectionRefusedReturnsUnknownError() throws Exception {
         server.stop(); // don't listen for this test
 
         Result result = p.httpCall(request).get();
