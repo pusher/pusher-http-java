@@ -26,8 +26,8 @@ import static org.asynchttpclient.Dsl.config;
  * PusherAsync pusher = new PusherAsync(APP_ID, KEY, SECRET);
  *
  * // Publish
- * CompletableFuture&lt;Result> futureTriggerResult = pusher.trigger("my-channel", "my-eventname", myPojoForSerialisation);
- * triggerResult.thenAccept(triggerResult -> {
+ * CompletableFuture&lt;Result&gt; futureTriggerResult = pusher.trigger("my-channel", "my-eventname", myPojoForSerialisation);
+ * triggerResult.thenAccept(triggerResult -&gt; {
  *   if (triggerResult.getStatus() == Status.SUCCESS) {
  *     // request was successful
  *   } else {
@@ -36,8 +36,8 @@ import static org.asynchttpclient.Dsl.config;
  * });
  *
  * // Query
- * CompletableFuture&lt;Result> futureChannelListResult = pusher.get("/channels");
- * futureChannelListResult.thenAccept(triggerResult -> {
+ * CompletableFuture&lt;Result&gt; futureChannelListResult = pusher.get("/channels");
+ * futureChannelListResult.thenAccept(triggerResult -&gt; {
  *   if (triggerResult.getStatus() == Status.SUCCESS) {
  *     String channelListAsJson = channelListResult.getMessage();
  *     // etc.
