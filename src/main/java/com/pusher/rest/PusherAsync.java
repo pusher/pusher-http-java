@@ -49,6 +49,8 @@ import static org.asynchttpclient.Dsl.config;
  *   }
  * });
  * </pre>
+ *
+ * See {@link Pusher} for the synchronous implementation.
  */
 public class PusherAsync extends PusherAbstract<CompletableFuture<Result>> {
 

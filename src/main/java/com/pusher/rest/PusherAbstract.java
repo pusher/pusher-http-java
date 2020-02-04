@@ -22,7 +22,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-abstract class PusherAbstract<T> {
+/**
+ * Parent class for Pusher clients, deals with anything that isn't IO related.
+ *
+ * @param <T> The return type of the IO calls.
+ *
+ * See {@link Pusher} for the synchronous implementation, {@link PusherAsync} for the asynchronous implementation.
+ */
+public abstract class PusherAbstract<T> {
     protected static final Gson BODY_SERIALISER = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();

@@ -46,6 +46,8 @@ import java.util.Map;
  *   // etc
  * }
  * </pre>
+ *
+ * See {@link PusherAsync} for the asynchronous implementation.
  */
 public class Pusher extends PusherAbstract<Result> {
 
