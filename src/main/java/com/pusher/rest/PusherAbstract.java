@@ -319,7 +319,14 @@ public abstract class PusherAbstract<T> {
      * @param parameters query parameters to submit with the request
      * @return a {@link Result} object encapsulating the success state and response to the request
      */
-    public abstract T get(final String path, final Map<String, String> parameters);
+    public T get(final String path, final Map<String, String> parameters) {
+        final String fullPath = "/apps/" + appId + path;
+        final URI uri = SignatureUtil.uri("GET", scheme, host, fullPath, null, key, secret, parameters);
+
+        return doGet(uri);
+    }
+
+    protected abstract T doGet(final URI uri);
 
     /**
      * Make a generic HTTP call to the Pusher API.
@@ -336,7 +343,14 @@ public abstract class PusherAbstract<T> {
      * @param body the body to submit
      * @return a {@link Result} object encapsulating the success state and response to the request
      */
-    public abstract T post(final String path, final String body);
+    public T post(final String path, final String body) {
+        final String fullPath = "/apps/" + appId + path;
+        final URI uri = SignatureUtil.uri("POST", scheme, host, fullPath, body, key, secret, Collections.<String, String>emptyMap());
+
+        return doPost(uri, body);
+    }
+
+    protected abstract T doPost(final URI uri, final String body);
 
     /**
      * If you wanted to send the HTTP API requests manually (e.g. using a different HTTP client), this method

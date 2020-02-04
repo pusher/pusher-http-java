@@ -16,8 +16,6 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
-import java.util.Map;
 
 /**
  * A library for interacting with the Pusher HTTP API.
@@ -149,18 +147,12 @@ public class Pusher extends PusherAbstract<Result> {
      */
 
     @Override
-    public Result get(final String path, final Map<String, String> parameters) {
-        final String fullPath = "/apps/" + appId + path;
-        final URI uri = SignatureUtil.uri("GET", scheme, host, fullPath, null, key, secret, parameters);
-
+    protected Result doGet(URI uri) {
         return httpCall(new HttpGet(uri));
     }
 
     @Override
-    public Result post(final String path, final String body) {
-        final String fullPath = "/apps/" + appId + path;
-        final URI uri = SignatureUtil.uri("POST", scheme, host, fullPath, body, key, secret, Collections.<String, String>emptyMap());
-
+    protected Result doPost(URI uri, String body) {
         final StringEntity bodyEntity = new StringEntity(body, "UTF-8");
         bodyEntity.setContentType("application/json");
 

@@ -1,7 +1,6 @@
 package com.pusher.rest;
 
 import com.pusher.rest.data.Result;
-import org.apache.http.entity.StringEntity;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.DefaultAsyncHttpClientConfig;
 import org.asynchttpclient.Request;
@@ -10,8 +9,6 @@ import org.asynchttpclient.util.HttpConstants;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -119,26 +116,17 @@ public class PusherAsync extends PusherAbstract<CompletableFuture<Result>> {
      */
 
     @Override
-    public CompletableFuture<Result> get(final String path, final Map<String, String> parameters) {
-        final String fullPath = "/apps/" + appId + path;
-        final URI uri = SignatureUtil.uri("GET", scheme, host, fullPath, null, key, secret, parameters);
-
-        Request request = new RequestBuilder(HttpConstants.Methods.GET)
-                .setUrl(uri.toString())
-                .build();
+    protected CompletableFuture<Result> doGet(URI uri) {
+        final Request request = new RequestBuilder(HttpConstants.Methods.GET)
+            .setUrl(uri.toString())
+            .build();
 
         return httpCall(request);
     }
 
     @Override
-    public CompletableFuture<Result> post(final String path, final String body) {
-        final String fullPath = "/apps/" + appId + path;
-        final URI uri = SignatureUtil.uri("POST", scheme, host, fullPath, body, key, secret, Collections.<String, String>emptyMap());
-
-        final StringEntity bodyEntity = new StringEntity(body, "UTF-8");
-        bodyEntity.setContentType("application/json");
-
-        Request request = new RequestBuilder(HttpConstants.Methods.POST)
+    protected CompletableFuture<Result> doPost(URI uri, String body) {
+        final Request request = new RequestBuilder(HttpConstants.Methods.POST)
                 .setUrl(uri.toString())
                 .setBody(body)
                 .addHeader("Content-Type", "application/json")
