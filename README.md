@@ -27,6 +27,15 @@ The pusher-http-java library is available in Maven Central:
 
 Javadocs for the latest version are published at <http://pusher.github.io/pusher-http-java/>. Javadoc artifacts are also in Maven and should be available for automatic download and attaching by your IDE.
 
+## Synchronous vs asynchronous
+
+The pusher-http-java library provides two APIs:
+
+- `com.pusher.rest.Pusher`, synchronous, based on Apache HTTP Client (4 series)
+- `com.pusher.rest.PusherAsync`, asynchronous, based on [AsyncHttpClient (AHC)](https://github.com/AsyncHttpClient/async-http-client)
+
+The following examples are using `Pusher`, but `PusherAsync` exposes the exact same API, while returning `CompletableFuture<T>` instead of `T`.
+
 ## Configuration
 
 The minimum configuration required to use the `Pusher` object are the three constructor arguments which identify your Pusher app. You can find them by going to "API Keys" on your app at <https://dashboard.pusher.com>.
@@ -71,25 +80,19 @@ If you wish to set a non-standard endpoint, perhaps for testing, you may use `se
 pusher.setHost("api-eu.pusher.com");
 ```
 
-#### Timeouts
-
-The default timeout is 4 seconds. A timeout in milliseconds to be applied to socket opens and reads can be applied, for example 10 seconds:
-
-```java
-pusher.setRequestTimeout(10000);
-```
-
 #### SSL
 
 HTTPS can be used as transport by calling `setEncrypted(true)`. Note that your credentials are not exposed on an unencrypted connection, however the contents of your messages are. Use this option if your messages themselves are sensitive.
 
 #### Advanced HTTP configuration
 
-The library uses Apache HTTP Client (4 series) internally to make HTTP requests. In order to expose some of the rich and fine configuration available in this component, it is partially exposed. The HttpClient uses the Builder pattern to specify configuration. The Pusher Channels library exposes a method to fetch an `HttpClientBuilder` with sensible defaults, and a method to set the client instance in use to one created by a particular builder. By using these two methods, you can further configure the client, overriding defaults or adding new settings.
+##### Synchronous library
+
+The synchronous library uses Apache HTTP Client (4 series) internally to make HTTP requests. In order to expose some of the rich and fine configuration available in this component, it is partially exposed. The HttpClient uses the Builder pattern to specify configuration. The Pusher Channels library exposes a method to fetch an `HttpClientBuilder` with sensible defaults, and a method to set the client instance in use to one created by a particular builder. By using these two methods, you can further configure the client, overriding defaults or adding new settings.
 
 For example:
 
-##### HTTP Proxy
+###### HTTP Proxy
 
 To set a proxy:
 
@@ -97,6 +100,22 @@ To set a proxy:
 HttpClientBuilder builder = Pusher.defaultHttpClientBuilder();
 builder.setProxy(new HttpHost("proxy.example.com"));
 pusher.configureHttpClient(builder);
+```
+
+##### Asynchronous library
+
+The asynchronous library uses AsyncHttpClient (AHC) internally to make HTTP requests. Just like the synchronous library, you have a fine-grained control over the HTTP configuration, see https://github.com/AsyncHttpClient/async-http-client. For example:
+
+###### HTTP Proxy
+
+To set a proxy:
+
+```java
+pusherAsync.configureHttpClient(
+    config()
+        .setProxyServer(proxyServer("127.0.0.1", 38080))
+        .setMaxRequestRetry(5)
+);
 ```
 
 ## Usage
@@ -238,7 +257,7 @@ Query parameters can't contain following keys, as they are used to sign the requ
 - auth_signature
 - body_md5
 
-### Multi-threaded usage
+### Multi-threaded usage with the synchronous library
 
 The library is threadsafe and intended for use from many threads simultaneously. By default, HTTP connections are persistent and a pool of open connections is maintained. This re-use reduces the overhead involved in repeated TCP connection establishments and teardowns.
 

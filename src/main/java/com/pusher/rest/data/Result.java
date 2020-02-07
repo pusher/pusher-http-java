@@ -95,6 +95,16 @@ public class Result {
     }
 
     /**
+     * Factory method
+     *
+     * @param t cause
+     * @return a Result encapsulating the params
+     */
+    public static Result fromThrowable(final Throwable t) {
+        return new Result(Status.UNKNOWN_ERROR, null, t.toString());
+    }
+
+    /**
      * @return the enum classifying the result of the call
      */
     public Status getStatus() {

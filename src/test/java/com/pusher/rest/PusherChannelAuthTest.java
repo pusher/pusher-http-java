@@ -1,19 +1,18 @@
 package com.pusher.rest;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-
-import java.util.Collections;
-
+import com.pusher.rest.data.PresenceUser;
+import com.pusher.rest.util.PusherNoHttp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.pusher.rest.data.PresenceUser;
+import java.util.Collections;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class PusherChannelAuthTest {
 
-    private final Pusher p = new Pusher("00001", "278d425bdf160c739803", "7ad3773142a6692b25b8");
+    private final PusherNoHttp p = new PusherNoHttp("00001", "278d425bdf160c739803", "7ad3773142a6692b25b8");
 
     @Test
     public void privateChannelAuth() {
