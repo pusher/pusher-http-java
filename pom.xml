@@ -73,6 +73,9 @@
           <name>gpg.passphrase</name>
         </property>
       </activation>
+      <properties>
+        <gpg.keyname>C68187EB</gpg.keyname>
+      </properties>
       <build>
         <plugins>
           <plugin>
