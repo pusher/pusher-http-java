@@ -1,7 +1,8 @@
 # Pusher Channels Java HTTP library
 
-[![Build
-Status](https://travis-ci.org/pusher/pusher-http-java.svg?branch=master)](https://travis-ci.org/pusher/pusher-http-java)
+[![Build Status](https://travis-ci.org/pusher/pusher-http-java.svg?branch=master)](https://travis-ci.org/pusher/pusher-http-java)
+[![Maven Central](https://img.shields.io/maven-central/v/com.pusher/pusher-http-java.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.pusher%22%20AND%20a:%22pusher-http-java%22)
+[![GitHub license](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://raw.githubusercontent.com/pusher/chatkit-android/master/LICENCE.txt)
 
 In order to use this library, you need to have an account on <http://pusher.com/channels>. After registering, you will need the application credentials for your app.
 
