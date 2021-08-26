@@ -1,31 +1,30 @@
 package com.pusher.rest;
 
-import static com.pusher.rest.util.Matchers.*;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.pusher.rest.crypto.CryptoUtil;
+import com.pusher.rest.data.EncryptedMessage;
+import com.pusher.rest.data.Event;
+import com.pusher.rest.marshaller.DataMarshaller;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.jmock.junit5.JUnit5Mockery;
 import org.jmock.imposters.ByteBuddyClassImposteriser;
+import org.jmock.junit5.JUnit5Mockery;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
-import com.pusher.rest.data.Event;
-import com.pusher.rest.marshaller.DataMarshaller;
+import static com.pusher.rest.util.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Tests which mock the HttpClient to check outgoing requests
@@ -35,6 +34,8 @@ public class PusherTest {
     static final String APP_ID = "00001";
     static final String KEY    = "157a2f3df564323a4a73";
     static final String SECRET = "3457a88be87f890dcd98";
+    static final String VALID_MASTER_KEY = "VGhlIDMyIGNoYXJzIGxvbmcgZW5jcnlwdGlvbiBrZXk=";
+    static final String INVALID_MASTER_KEY = "VGhlIDMyIGNoYXJzIGxvbmcgZW5jce";
 
     private final Mockery context = new JUnit5Mockery() {{
         setImposteriser(ByteBuddyClassImposteriser.INSTANCE);
@@ -46,6 +47,10 @@ public class PusherTest {
 
     @BeforeEach
     public void setup() {
+        configureHttpClient(p);
+    }
+
+    private void configureHttpClient(Pusher p) {
         p.configureHttpClient(new HttpClientBuilder() {
             @Override
             public CloseableHttpClient build() {
@@ -118,12 +123,7 @@ public class PusherTest {
                 return (String)data;
             }
         };
-        p.configureHttpClient(new HttpClientBuilder() {
-            @Override
-            public CloseableHttpClient build() {
-                return httpClient;
-            }
-        });
+        configureHttpClient(p);
 
         context.checking(new Expectations() {{
             oneOf(httpClient).execute(with(field("data", "this is my string data")));
@@ -155,7 +155,7 @@ public class PusherTest {
             );
         }});
 
-        List<Event> batch = new ArrayList<Event>();
+        List<Event> batch = new ArrayList<>();
         batch.add(new Event("my-channel", "event-name", new MyPojo("value1", 42)));
         batch.add(new Event("my-channel", "event-name", new MyPojo("value2", 43), "22.33"));
 
@@ -236,5 +236,151 @@ public class PusherTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             p.get("/channels", Collections.singletonMap("auth_timestamp", "anything"));
         });
+    }
+
+    @Test
+    public void testTriggerOnEncryptedChannel() throws IOException {
+        final Pusher pe = new Pusher(APP_ID, KEY, SECRET, VALID_MASTER_KEY);
+        configureHttpClient(pe);
+
+        CryptoUtil cryptoUtilMock = context.mock(CryptoUtil.class);
+        pe.setCryptoUtil(cryptoUtilMock);
+
+        final Map<String, String> testData = Collections.singletonMap("n", "1");
+
+        final byte[] expectedMessage = "{\"n\":\"1\"}".getBytes(StandardCharsets.UTF_8);
+        context.checking(new Expectations() {{
+            oneOf(cryptoUtilMock).encrypt(with(same("private-encrypted-test")), with(equal(expectedMessage)));
+            will(returnValue(new EncryptedMessage("1", "2")));
+        }});
+
+        final String expectedData = "{\"nonce\":\"1\",\"ciphertext\":\"2\"}";
+        context.checking(new Expectations() {{
+            oneOf(httpClient).execute(with(field("data", expectedData)));
+        }});
+
+
+        pe.trigger("private-encrypted-test", "test-event", testData);
+    }
+
+    @Test
+    public void testTriggerBatchOnEncryptedChannel() throws IOException {
+        final Pusher pe = new Pusher(APP_ID, KEY, SECRET, VALID_MASTER_KEY);
+        configureHttpClient(pe);
+
+        CryptoUtil cryptoUtilMock = context.mock(CryptoUtil.class);
+        pe.setCryptoUtil(cryptoUtilMock);
+
+        final byte[] expectedMessage = "{\"n\":\"1\"}".getBytes(StandardCharsets.UTF_8);
+        context.checking(new Expectations() {{
+            oneOf(cryptoUtilMock).encrypt(with(same("private-encrypted-test")), with(equal(expectedMessage)));
+            will(returnValue(new EncryptedMessage("e1", "e2")));
+        }});
+
+        final List<Map<String, Object>> expectedData = new ArrayList<Map<String, Object>>() {{
+            add(new HashMap<String, Object>() {{
+                put("channel", "private-encrypted-test");
+                put("name", "event-name");
+                put("data", "{\"nonce\":\"e1\",\"ciphertext\":\"e2\"}");
+            }});
+
+            add(new HashMap<String, Object>() {{
+                put("channel", "my-channel");
+                put("name", "event-name");
+                put("data", "{\"n\":\"2\"}");
+            }});
+        }};
+
+        context.checking(new Expectations() {{
+            oneOf(httpClient).execute(with(field("batch", expectedData)));
+        }});
+
+        List<Event> testBatch = new ArrayList<Event>();
+        testBatch.add(new Event("private-encrypted-test", "event-name", Collections.singletonMap("n", "1")));
+        testBatch.add(new Event("my-channel", "event-name", Collections.singletonMap("n", "2")));
+
+        pe.trigger(testBatch);
+    }
+
+    @Test
+    public void testInstantiatePusherWithInvalidMasterKey() {
+        final Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new Pusher(APP_ID, KEY, SECRET, INVALID_MASTER_KEY);
+        });
+
+        assertThat(
+            exception.getMessage(),
+            containsString("encryptionMasterKeyBase64 must be a 32 byte key, base64 encoded")
+        );
+    }
+
+    @Test
+    public void testInstantiatePusherWithEmptyMasterKey() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new Pusher(APP_ID, KEY, SECRET, "");
+        });
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new Pusher(APP_ID, KEY, SECRET, null);
+        });
+    }
+
+    @Test
+    public void testTriggerOnEncryptedChannelWithoutMasterKey() {
+        final Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+            p.trigger("private-encrypted-test", "test-event", "testData");
+        });
+
+        assertThat(
+            exception.getMessage(),
+            is(PusherException.encryptionMasterKeyRequired().getMessage())
+        );
+    }
+
+    @Test
+    public void testTriggerBatchOnEncryptedChannelWithoutMasterKey() {
+        List<Event> events = Arrays.asList(
+            new Event("private-encrypted-test", "test_event", "test_data1"),
+            new Event("private-encrypted-test", "test_event", "test_data2")
+        );
+
+        final Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+            p.trigger(events);
+        });
+
+        assertThat(
+            exception.getMessage(),
+            is(PusherException.encryptionMasterKeyRequired().getMessage())
+        );
+    }
+
+    @Test
+    public void testTriggerOnMultipleChannelsWithEncryptedChannelIsNotSupported() throws IOException {
+        final Pusher pe = new Pusher(APP_ID, KEY, SECRET, VALID_MASTER_KEY);
+        configureHttpClient(pe);
+
+        final Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+            pe.trigger(Arrays.asList("private-encrypted-test", "another-channel"), "test_data", "test_data");
+        });
+
+        assertThat(
+            exception.getMessage(),
+            is(PusherException.cannotTriggerMultipleChannelsWithEncryption().getMessage())
+        );
+    }
+
+    @Test
+    public void testTriggerOnMultipleEncryptedChannelsIsNotSupported() throws IOException {
+        final Pusher pe = new Pusher(APP_ID, KEY, SECRET, VALID_MASTER_KEY);
+        configureHttpClient(pe);
+
+        final Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+            pe.trigger(Arrays.asList("private-encrypted-test1", "private-encrypted-test2"), "test_data", "test_data");
+        });
+
+        assertThat(
+            exception.getMessage(),
+            is(PusherException.cannotTriggerMultipleChannelsWithEncryption().getMessage())
+        );
     }
 }

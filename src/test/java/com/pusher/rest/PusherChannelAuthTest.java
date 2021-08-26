@@ -130,4 +130,16 @@ public class PusherChannelAuthTest {
             p.authenticate("1234.1234", "foobar", new PresenceUser("dave"));
         });
     }
+
+    @Test
+    public void encryptedChannelWithoutMasterKey() {
+        final Exception exception = Assertions.assertThrows(RuntimeException.class, () -> {
+            p.authenticate("1234.1234", "private-encrypted-foobar");
+        });
+
+        assertThat(
+            exception.getMessage(),
+            is(PusherException.encryptionMasterKeyRequired().getMessage())
+        );
+    }
 }

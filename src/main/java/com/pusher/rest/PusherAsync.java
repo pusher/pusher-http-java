@@ -68,6 +68,22 @@ public class PusherAsync extends PusherAbstract<CompletableFuture<Result>> imple
         configureHttpClient(config());
     }
 
+    /**
+     * Construct an instance of the Pusher object through which you may interact with the Pusher API.
+     * <p>
+     * The parameters to use are found on your dashboard at https://app.pusher.com and are specific per App.
+     * <p>
+     *
+     * @param appId  The ID of the App you will to interact with.
+     * @param key    The App Key, the same key you give to websocket clients to identify your app when they connect to Pusher.
+     * @param secret The App Secret. Used to sign requests to the API, this should be treated as sensitive and not distributed.
+     * @param encryptionMasterKeyBase64 32 byte key, base64 encoded. This key, along with the channel name, are used to derive per-channel encryption keys.
+     */
+    public PusherAsync(final String appId, final String key, final String secret, final String encryptionMasterKeyBase64) {
+        super(appId, key, secret, encryptionMasterKeyBase64);
+        configureHttpClient(config());
+    }
+
     public PusherAsync(final String url) {
         super(url);
         configureHttpClient(config());

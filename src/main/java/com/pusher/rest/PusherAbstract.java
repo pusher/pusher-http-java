@@ -3,18 +3,14 @@ package com.pusher.rest;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.pusher.rest.data.AuthData;
-import com.pusher.rest.data.Event;
-import com.pusher.rest.data.EventBatch;
-import com.pusher.rest.data.PresenceUser;
-import com.pusher.rest.data.Result;
-import com.pusher.rest.data.TriggerData;
-import com.pusher.rest.data.Validity;
+import com.pusher.rest.crypto.CryptoUtil;
+import com.pusher.rest.data.*;
 import com.pusher.rest.marshaller.DataMarshaller;
 import com.pusher.rest.marshaller.DefaultDataMarshaller;
 import com.pusher.rest.util.Prerequisites;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +31,7 @@ public abstract class PusherAbstract<T> {
             .create();
 
     private static final Pattern HEROKU_URL = Pattern.compile("(https?)://(.+):(.+)@(.+:?.*)/apps/(.+)");
+    private static final String ENCRYPTED_CHANNEL_PREFIX = "private-encrypted-";
 
     protected final String appId;
     protected final String key;
@@ -44,6 +41,8 @@ public abstract class PusherAbstract<T> {
     protected String scheme = "http";
 
     private DataMarshaller dataMarshaller;
+    private CryptoUtil crypto;
+    private final boolean hasValidEncryptionMasterKey;
 
     /**
      * Construct an instance of the Pusher object through which you may interact with the Pusher API.
@@ -64,6 +63,35 @@ public abstract class PusherAbstract<T> {
         this.appId = appId;
         this.key = key;
         this.secret = secret;
+        this.hasValidEncryptionMasterKey = false;
+
+        configureDataMarshaller();
+    }
+
+    /**
+     * Construct an instance of the Pusher object through which you may interact with the Pusher API.
+     * <p>
+     * The parameters to use are found on your dashboard at https://app.pusher.com and are specific per App.
+     * <p>
+     *
+     * @param appId  The ID of the App you will to interact with.
+     * @param key    The App Key, the same key you give to websocket clients to identify your app when they connect to Pusher.
+     * @param secret The App Secret. Used to sign requests to the API, this should be treated as sensitive and not distributed.
+     * @param encryptionMasterKeyBase64 32 byte key, base64 encoded. This key, along with the channel name, are used to derive per-channel encryption keys.
+     */
+    public PusherAbstract(final String appId, final String key, final String secret, final String encryptionMasterKeyBase64) {
+        Prerequisites.nonEmpty("appId", appId);
+        Prerequisites.nonEmpty("key", key);
+        Prerequisites.nonEmpty("secret", secret);
+        Prerequisites.isValidSha256Key("secret", secret);
+        Prerequisites.nonEmpty("encryptionMasterKeyBase64", encryptionMasterKeyBase64);
+
+        this.appId = appId;
+        this.key = key;
+        this.secret = secret;
+
+        this.crypto = new CryptoUtil(encryptionMasterKeyBase64);
+        this.hasValidEncryptionMasterKey = true;
 
         configureDataMarshaller();
     }
@@ -78,6 +106,7 @@ public abstract class PusherAbstract<T> {
             this.secret = m.group(3);
             this.host = m.group(4);
             this.appId = m.group(5);
+            this.hasValidEncryptionMasterKey = false;
         } else {
             throw new IllegalArgumentException("URL '" + url + "' does not match pattern '<scheme>://<key>:<secret>@<host>[:<port>]/apps/<appId>'");
         }
@@ -88,6 +117,10 @@ public abstract class PusherAbstract<T> {
 
     private void configureDataMarshaller() {
         this.dataMarshaller = new DefaultDataMarshaller();
+    }
+
+    protected void setCryptoUtil(CryptoUtil crypto) {
+        this.crypto = crypto;
     }
 
     /*
@@ -257,10 +290,29 @@ public abstract class PusherAbstract<T> {
         Prerequisites.areValidChannels(channels);
         Prerequisites.isValidSocketId(socketId);
 
-        final String body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, serialise(data), socketId));
+        final String eventBody;
+        final String encryptedChannel = channels.stream()
+            .filter(this::isEncryptedChannel)
+            .findFirst()
+            .orElse("");
+
+        if (encryptedChannel.isEmpty()) {
+            eventBody = serialise(data);
+        } else {
+            requireEncryptionMasterKey();
+
+            if (channels.size() > 1) {
+                throw PusherException.cannotTriggerMultipleChannelsWithEncryption();
+            }
+
+            eventBody = encryptPayload(encryptedChannel, serialise(data));
+        }
+
+        final String body = BODY_SERIALISER.toJson(new TriggerData(channels, eventName, eventBody, socketId));
 
         return post("/events", body);
     }
+
 
     /**
      * Publish a batch of different events with a single API call.
@@ -272,16 +324,28 @@ public abstract class PusherAbstract<T> {
      */
     public T trigger(final List<Event> batch) {
         final List<Event> eventsWithSerialisedBodies = new ArrayList<Event>(batch.size());
+
         for (final Event e : batch) {
+            final String eventData;
+
+            if (isEncryptedChannel(e.getChannel())) {
+                requireEncryptionMasterKey();
+
+                eventData = encryptPayload(e.getChannel(), serialise(e.getData()));
+            } else {
+                eventData = serialise(e.getData());
+            }
+
             eventsWithSerialisedBodies.add(
                     new Event(
                             e.getChannel(),
                             e.getName(),
-                            serialise(e.getData()),
+                            eventData,
                             e.getSocketId()
                     )
             );
         }
+
         final String body = BODY_SERIALISER.toJson(new EventBatch(eventsWithSerialisedBodies));
 
         return post("/batch_events", body);
@@ -408,7 +472,16 @@ public abstract class PusherAbstract<T> {
         }
 
         final String signature = SignatureUtil.sign(socketId + ":" + channel, secret);
-        return BODY_SERIALISER.toJson(new AuthData(key, signature));
+
+        final AuthData authData = new AuthData(key, signature);
+
+        if (isEncryptedChannel(channel)) {
+            requireEncryptionMasterKey();
+
+            authData.setSharedSecret(crypto.generateBase64EncodedSharedSecret(channel));
+        }
+
+        return BODY_SERIALISER.toJson(authData);
     }
 
     /**
@@ -462,4 +535,25 @@ public abstract class PusherAbstract<T> {
         return xPusherSignatureHeader.trim().equals(recalculatedSignature) ? Validity.VALID : Validity.INVALID;
     }
 
+    private boolean isEncryptedChannel(final String channel) {
+        return channel.startsWith(ENCRYPTED_CHANNEL_PREFIX);
+    }
+
+    private void requireEncryptionMasterKey()
+    {
+        if (hasValidEncryptionMasterKey) {
+            return;
+        }
+
+        throw PusherException.encryptionMasterKeyRequired();
+    }
+
+    private String encryptPayload(final String encryptedChannel, final String payload) {
+        final EncryptedMessage encryptedMsg = crypto.encrypt(
+            encryptedChannel,
+            payload.getBytes(StandardCharsets.UTF_8)
+        );
+
+        return BODY_SERIALISER.toJson(encryptedMsg);
+    }
 }

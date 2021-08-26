@@ -274,6 +274,39 @@ pusher.configureHttpClient(
 );
 ```
 
+### End-to-end encryption
+
+This library supports end-to-end encryption of your private channels. This means that only you and your connected clients will be able to read your messages. Pusher cannot decrypt them. 
+
+You can enable this feature by following these steps:
+
+1. You should first set up Private channels. This involves [creating an authentication endpoint on your server](https://pusher.com/docs/authenticating_users).
+
+2. Next, generate your 32 byte master encryption key, encode it as base64 and pass it to the Pusher constructor.
+
+   This is secret, and you should never share this with anyone. Not even Pusher.
+
+    Generate base64 encoded 32 byte key:
+
+   ```bash
+   openssl rand -base64 32
+   ```
+
+   ```java
+   Pusher pusher = new Pusher(APP_ID, API_KEY, API_SECRET, ENCRYPTION_MASTER_KEY_BASE64);
+   ```
+
+5. Channels where you wish to use end-to-end encryption should be prefixed with `private-encrypted-`.
+
+6. Subscribe to these channels in your client, and you're done! You can verify it is working by checking out the debug console on the [dashboard](https://dashboard.pusher.com/) and seeing the scrambled ciphertext.
+
+**Important note: This will **not** encrypt messages on channels that are not prefixed by `private-encrypted-`.**
+
+**Limitation**: you cannot trigger a single event on multiple channels in a call to `trigger` when one of the channels is e2e encrypted (i.e. prefixed by `private-encrypted-`).
+
+Rationale: the methods in this library map directly to individual Channels HTTP API requests. If we allowed triggering a single event on multiple channels (some encrypted, some unencrypted), then it would require two API requests: one where the event is encrypted to the encrypted channels, and one where the event is unencrypted for unencrypted channels.
+
+
 ## License
 
 This code is free to use under the terms of the MIT license.
