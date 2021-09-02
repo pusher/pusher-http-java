@@ -4,6 +4,7 @@ public class AuthData {
 
     private final String auth;
     private final String channelData;
+    private String sharedSecret;
 
     /**
      * Private channel constructor
@@ -33,5 +34,13 @@ public class AuthData {
 
     public String getChannelData() {
         return channelData;
+    }
+
+    public String getSharedSecret() {
+        return sharedSecret;
+    }
+
+    public void setSharedSecret(final String sharedSecret) {
+        this.sharedSecret = sharedSecret;
     }
 }
