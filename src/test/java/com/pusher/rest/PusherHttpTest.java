@@ -3,16 +3,10 @@ package com.pusher.rest;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.io.IOException;
-
-import org.apache.http.HttpException;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.localserver.LocalTestServer;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpRequestHandler;
+import org.apache.http.impl.bootstrap.HttpServer;
+import org.apache.http.impl.bootstrap.ServerBootstrap;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +19,7 @@ import com.pusher.rest.data.Result.Status;
  */
 public class PusherHttpTest {
 
-    private LocalTestServer server;
+    private HttpServer server;
     private HttpGet request;
 
     private int responseStatus = 200;
@@ -35,29 +29,28 @@ public class PusherHttpTest {
 
     @BeforeEach
     public void setup() throws Exception {
-        server = new LocalTestServer(null, null);
-        server.register("/*", new HttpRequestHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
-                response.setStatusCode(responseStatus);
+        server = ServerBootstrap.bootstrap()
+            .registerHandler("/*", (httpRequest, httpResponse, httpContext) -> {
+                httpResponse.setStatusCode(responseStatus);
                 if (responseBody != null) {
-                    response.setEntity(new StringEntity(responseBody));
+                    httpResponse.setEntity(new StringEntity(responseBody));
                 }
-            }
-        });
+            }).create();
 
         server.start();
-        request = new HttpGet("http://" + server.getServiceAddress().getHostName() + ":" + server.getServiceAddress().getPort() + "/test");
+
+        request = new HttpGet("http://" + server.getInetAddress().getHostName() + ":" + server.getLocalPort() + "/test");
 
         p = new Pusher(PusherTest.APP_ID, PusherTest.KEY, PusherTest.SECRET);
     }
 
     @AfterEach
-    public void teardown() throws Exception {
+    public void teardown() {
         server.stop();
     }
 
     @Test
-    public void successReturnsOkAndBody() throws Exception {
+    public void successReturnsOkAndBody() {
         responseStatus = 200;
         responseBody = "{}";
 
@@ -67,7 +60,7 @@ public class PusherHttpTest {
     }
 
     @Test
-    public void status400ReturnsGenericErrorAndMessage() throws Exception {
+    public void status400ReturnsGenericErrorAndMessage() {
         responseStatus = 400;
         responseBody = "A lolcat got all up in ur request";
 
@@ -77,7 +70,7 @@ public class PusherHttpTest {
     }
 
     @Test
-    public void status401ReturnsAuthenticationErrorAndMessage() throws Exception {
+    public void status401ReturnsAuthenticationErrorAndMessage() {
         responseStatus = 401;
         responseBody = "Sorry, not in those shoes";
 
@@ -87,7 +80,7 @@ public class PusherHttpTest {
     }
 
     @Test
-    public void status403ReturnsAuthenticationErrorAndMessage() throws Exception {
+    public void status403ReturnsAuthenticationErrorAndMessage() {
         responseStatus = 403;
         responseBody = "Sorry, not with all those friends";
 
@@ -97,7 +90,7 @@ public class PusherHttpTest {
     }
 
     @Test
-    public void status404ReturnsNotFoundErrorAndMessage() throws Exception {
+    public void status404ReturnsNotFoundErrorAndMessage() {
         responseStatus = 404;
         responseBody = "This is not the endpoint you are looking for";
 
@@ -107,7 +100,7 @@ public class PusherHttpTest {
     }
 
     @Test
-    public void status500ReturnsServerErrorAndMessage() throws Exception {
+    public void status500ReturnsServerErrorAndMessage() {
         responseStatus = 500;
         responseBody = "Gary? Gary! It's on fire!!";
 
@@ -117,7 +110,7 @@ public class PusherHttpTest {
     }
 
     @Test
-    public void status503ReturnsServerErrorAndMessage() throws Exception {
+    public void status503ReturnsServerErrorAndMessage() {
         responseStatus = 503;
         responseBody = "Gary, did you restart all the back-ends at once?!";
 
@@ -127,7 +120,7 @@ public class PusherHttpTest {
     }
 
     @Test
-    public void connectionRefusedReturnsNetworkError() throws Exception {
+    public void connectionRefusedReturnsNetworkError() {
         server.stop(); // don't listen for this test
 
         Result result = p.httpCall(request);

@@ -2,22 +2,15 @@ package com.pusher.rest;
 
 import com.pusher.rest.data.Result;
 import com.pusher.rest.data.Result.Status;
-import org.apache.http.HttpException;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.localserver.LocalTestServer;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpRequestHandler;
+import org.apache.http.impl.bootstrap.HttpServer;
+import org.apache.http.impl.bootstrap.ServerBootstrap;
 import org.asynchttpclient.Request;
 import org.asynchttpclient.RequestBuilder;
 import org.asynchttpclient.util.HttpConstants;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -28,7 +21,7 @@ import static org.hamcrest.Matchers.is;
  */
 public class PusherAsyncHttpTest {
 
-    private LocalTestServer server;
+    private HttpServer server;
     private Request request;
 
     private int responseStatus = 200;
@@ -38,26 +31,26 @@ public class PusherAsyncHttpTest {
 
     @BeforeEach
     public void setup() throws Exception {
-        server = new LocalTestServer(null, null);
-        server.register("/*", new HttpRequestHandler() {
-            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
-                response.setStatusCode(responseStatus);
+        server = ServerBootstrap.bootstrap()
+            .registerHandler("/*", (httpRequest, httpResponse, httpContext) -> {
+                httpResponse.setStatusCode(responseStatus);
                 if (responseBody != null) {
-                    response.setEntity(new StringEntity(responseBody));
+                    httpResponse.setEntity(new StringEntity(responseBody));
                 }
-            }
-        });
+            })
+            .create();
 
         server.start();
+
         request = new RequestBuilder(HttpConstants.Methods.GET)
-                .setUrl("http://" + server.getServiceAddress().getHostName() + ":" + server.getServiceAddress().getPort() + "/test")
+                .setUrl("http://" + server.getInetAddress().getHostName() + ":" + server.getLocalPort() + "/test")
                 .build();
 
         p = new PusherAsync(PusherTest.APP_ID, PusherTest.KEY, PusherTest.SECRET);
     }
 
     @AfterEach
-    public void teardown() throws Exception {
+    public void teardown() {
         server.stop();
     }
 
