@@ -1,3 +1,9 @@
+# 1.3.0 2021-09-06
+
+[ADDED] Support for end-2-end encryption
+
+[CHANGED] Upgraded httpclient to v4.5.13
+
 # 1.2.1 2021-04-19
 
 [CHANGED] Upgraded asynchttpclient to v2.12.13 (https://nvd.nist.gov/vuln/detail/CVE-2019-20444)
