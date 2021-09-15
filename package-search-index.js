@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.pusher.rest"},{"l":"com.pusher.rest.data"},{"l":"com.pusher.rest.marshaller"},{"l":"com.pusher.rest.util"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.pusher.rest"},{"l":"com.pusher.rest.crypto"},{"l":"com.pusher.rest.crypto.nacl"},{"l":"com.pusher.rest.data"},{"l":"com.pusher.rest.marshaller"},{"l":"com.pusher.rest.util"}];updateSearchResults();

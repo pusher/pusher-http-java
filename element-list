@@ -1,4 +1,6 @@
 com.pusher.rest
+com.pusher.rest.crypto
+com.pusher.rest.crypto.nacl
 com.pusher.rest.data
 com.pusher.rest.marshaller
 com.pusher.rest.util
