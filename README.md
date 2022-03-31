@@ -8,7 +8,7 @@ In order to use this library, you need to have an account on <http://pusher.com/
 
 ## Supported platforms
 
-* Java SE - supports versions 8, 9, 10 and 11.
+* Java SE - supports versions 8, 9, 10, 11 and 17.
 * Oracle JDK
 * OpenJDK
 
@@ -20,7 +20,7 @@ The pusher-http-java library is available in Maven Central:
 <dependency>
   <groupId>com.pusher</groupId>
   <artifactId>pusher-http-java</artifactId>
-  <version>1.2.1</version>
+  <version>1.3.0</version>
 </dependency>
 ```
 
