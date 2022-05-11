@@ -15,7 +15,8 @@ public class SecretBox {
     public static Map<String, byte[]> box(final byte[] key, final byte[] message) {
         TweetNaclFast.SecretBox secretBox = new TweetNaclFast.SecretBox(key);
 
-        final byte[] nonce = new SecureRandom().generateSeed(NONCE_LENGTH);
+        final byte[] nonce = new byte[NONCE_LENGTH];
+        new SecureRandom().nextBytes(nonce);
         final byte[] cipher = secretBox.box(message, nonce);
 
         final Map<String, byte[]> res = new HashMap<>();
