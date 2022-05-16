@@ -1,3 +1,7 @@
+# 1.3.1 2022-05-16
+
+[CHANGED] Use SecureRandom.nextBytes instead of SecureRandom.generateSeed
+
 # 1.3.0 2021-09-02
 
 [ADDED] Add end-to-end encryption support
