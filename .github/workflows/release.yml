@@ -1,0 +1,18 @@
+name: Release
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Maven Library build and publish
+        uses: MathieuSoysal/Java-maven-library-publisher@v1.0.3
+        with:
+          nexus-username: ${{ secrets.NEXUS_USERNAME }}
+          nexus-password: ${{ secrets.NEXUS_PASSWORD }}
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          java-version: 17
