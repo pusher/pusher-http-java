@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 public abstract class PusherAbstract<T> {
     protected static final Gson BODY_SERIALISER = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .disableHtmlEscaping()
             .create();
 
     private static final Pattern HEROKU_URL = Pattern.compile("(https?)://(.+):(.+)@(.+:?.*)/apps/(.+)");
