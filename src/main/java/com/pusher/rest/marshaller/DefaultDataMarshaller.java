@@ -1,13 +1,17 @@
 package com.pusher.rest.marshaller;
 
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class DefaultDataMarshaller implements DataMarshaller {
 
    private final Gson gson;
 
    public DefaultDataMarshaller() {
-      gson = new Gson();
+       gson = new GsonBuilder()
+           .disableHtmlEscaping()
+           .create();
    }
 
    public DefaultDataMarshaller(Gson customGsonInstance) {
