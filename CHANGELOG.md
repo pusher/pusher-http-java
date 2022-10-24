@@ -1,15 +1,17 @@
-# 1.3.1 2022-05-16
+# Changelog
 
-[CHANGED] Use SecureRandom.nextBytes instead of SecureRandom.generateSeed
+## 1.3.1 2022-05-16
 
-# 1.3.0 2021-09-02
+- [CHANGED] Use SecureRandom.nextBytes instead of SecureRandom.generateSeed
 
-[ADDED] Add end-to-end encryption support
+## 1.3.0 2021-09-02
 
-# 1.2.1 2021-04-19
+- [ADDED] Add end-to-end encryption support
 
-[CHANGED] Upgraded asynchttpclient to v2.12.13 (https://nvd.nist.gov/vuln/detail/CVE-2019-20444)
+## 1.2.1 2021-04-19
 
-# 1.2.0 2020-04-20
+- [CHANGED] Upgraded asynchttpclient to v2.12.13 (https://nvd.nist.gov/vuln/detail/CVE-2019-20444)
 
-[ADDED] Support for asynchronous http calls
+## 1.2.0 2020-04-20
+
+- [ADDED] Support for asynchronous http calls

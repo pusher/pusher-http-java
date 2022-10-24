@@ -8,7 +8,7 @@ In order to use this library, you need to have an account on <http://pusher.com/
 
 ## Supported platforms
 
-* Java SE - supports versions 8, 9, 10, 11 and 17.
+* Java SE - supports versions 8, 11 and 17.
 * Oracle JDK
 * OpenJDK
 
@@ -20,7 +20,7 @@ The pusher-http-java library is available in Maven Central:
 <dependency>
   <groupId>com.pusher</groupId>
   <artifactId>pusher-http-java</artifactId>
-  <version>1.3.1</version>
+  <version>1.3.3</version>
 </dependency>
 ```
 
@@ -276,7 +276,7 @@ pusher.configureHttpClient(
 
 ### End-to-end encryption
 
-This library supports end-to-end encryption of your private channels. This means that only you and your connected clients will be able to read your messages. Pusher cannot decrypt them. 
+This library supports end-to-end encryption of your private channels. This means that only you and your connected clients will be able to read your messages. Pusher cannot decrypt them.
 
 You can enable this feature by following these steps:
 

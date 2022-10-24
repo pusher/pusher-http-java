@@ -2,3 +2,9 @@
 .project
 target
 
+# Output directory
+target
+
+build
+.gradle
+.idea
