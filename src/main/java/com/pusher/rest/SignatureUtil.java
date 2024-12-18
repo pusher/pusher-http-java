@@ -36,7 +36,7 @@ public class SignatureUtil {
             final Map<String, String> allParams = new HashMap<String, String>(extraParams);
             allParams.put("auth_key", key);
             allParams.put("auth_version", "1.0");
-            allParams.put("auth_timestamp", new Long(System.currentTimeMillis() / 1000).toString());
+            allParams.put("auth_timestamp", Long.toString(System.currentTimeMillis() / 1000));
             if (body != null) {
                 allParams.put("body_md5", bodyMd5(body));
             }
