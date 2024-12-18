@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.4
+
+- [CHANGED] Updated org.asynchttpclient:async-http-client to 3.0.1 to address a vulnerability
+- [CHANGED] Updated CI matrix to remove Java 8 and add Java 21, reflecting current support policy
+- [CHANGED] Replaced deprecated  constructor with  in 
+- [REMOVED] Deprecated org.ajoberstar.github-pages plugin and associated configuration
+
 ## 1.3.1 2022-05-16
 
 - [CHANGED] Use SecureRandom.nextBytes instead of SecureRandom.generateSeed
