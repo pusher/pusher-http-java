@@ -31,6 +31,6 @@ jobs:
           perl -pi -e 's/version = "${{env.CURRENT_VERSION}}"/version = "${{steps.bump.outputs.new_version}}"/' build.gradle
           perl -pi -e 's/${{env.CURRENT_VERSION}}/${{steps.bump.outputs.new_version}}/' README.md
 
-          git add README.md CHANGELOG.md
+          git add README.md CHANGELOG.md build.gradle
           git commit -m "Bump to version ${{ steps.bump.outputs.new_version }}"
           git push
