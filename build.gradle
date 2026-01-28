@@ -24,7 +24,7 @@ repositories {
 }
 
 group = "com.pusher"
-version = "1.3.4"
+version = "1.3.5"
 description = "Pusher HTTP Client"
 
 // Netty version override to address CVE-2025-24970, CVE-2025-25193, CVE-2025-55163,

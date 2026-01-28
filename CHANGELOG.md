@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.5
+
+- [CHANGED] Update async-http-client to 3.0.6.
+- [CHANGED] Change dependency scopes to api.
+- [CHANGED] Upgrade Netty to 4.1.129.Final.
+
 ## 1.3.4
 
 - [CHANGED] Updated org.asynchttpclient:async-http-client to 3.0.1 to address a vulnerability
