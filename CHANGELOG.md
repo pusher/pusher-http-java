@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.6
+
+- [CHANGED] Migrate Maven Central publishing from the retired Sonatype OSSRH service to the Sonatype Central Portal, via the gradle-nexus/publish-plugin. 1.3.5 was tagged and released on GitHub but never reached Maven Central because OSSRH had already shut down; this release re-publishes the same code through the working pipeline.
+
 ## 1.3.5
 
 - [CHANGED] Update async-http-client to 3.0.6.
